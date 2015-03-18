@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MyController</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="title_activity_internet">internet</string>
+    <string name="title_activity_remote">remote</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_osc_box">OSC_box</string>
+    <string name="title_activity_menu_activity">Menu_activity</string>
+    <string name="title_activity_single__rc">Single_RC</string>
+    <string name="title_activity_ibeacon_test">IbeaconTest</string>
+    <string name="double_RC">双指遥控</string>
+    <string name="title_activity_bt">BT</string>
+
+</resources>
