@@ -1,3 +1,5 @@
+#include <avr/eeprom.h>
+
 #ifndef SPEED_H
 #define SPEED_H
 
@@ -7,9 +9,16 @@
 class Speed{
   public :
     Speed();
-    void init();
-    int getCount();
     float getSpeed();
+    void init();
+    
+    void addTotalDist(int meter);
+    int getTotalDist();
+   
+    void writeOnceDist();
+    void getOnceDist();
+    void clearOnceDist(); 
+   
   private :
     int c;
 };

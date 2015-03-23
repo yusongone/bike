@@ -1,15 +1,23 @@
 #include "Protocol.h"
 
+
 #define bufferSize 10
 #define RECIVE_BUFFER_SIZE 64
 #define SET_RAW_RC 200
 #define TEST 99
+
+#define GET_SPEED 100
+
+
 String headString;
 int dataLength=-1;
 int startData=0;
 int subIndex=0;
 int msgId;
 uint8_t  buf[RECIVE_BUFFER_SIZE];
+
+
+
 
 boolean checkSum(){
   byte c=buf[0];
@@ -22,7 +30,7 @@ boolean checkSum(){
   return false;
 }
 
-void reciveCMD(){
+void Protocol::reciveCMD(){
   int dl=Serial.available();
   while(dl--){
     byte tempByte=Serial.read();
@@ -37,7 +45,7 @@ void reciveCMD(){
     }else if(startData>2){ 
         if(dataLength==-1){
           if(checkSum()){
-            switchCMD();
+            Protocol::switchCMD();
           };
           startData=0;
           subIndex=0;
@@ -46,10 +54,11 @@ void reciveCMD(){
             dataLength--;
         }
     }
-    if(tempByte=='$'||tempByte=='M'||tempByte=='>'){
+    if(tempByte=='$'||tempByte=='M'||tempByte=='>'||tempByte=='<'){
       headString+= (char)tempByte;
-      if(headString=="$M>"){
+      if(headString=="$M>"||headString=="$M<"){
         startData=1;
+        Protocol::switchCMD();
       }
     }else{
       headString="";
@@ -57,29 +66,15 @@ void reciveCMD(){
   }
 };
 
-void switchCMD(){
+void Protocol::switchCMD(){
    switch (msgId){
-    case SET_RAW_RC:
-      setRAWData();
+    case GET_SPEED:
+     // setRAWData();
+      
     break;
     case TEST:
     break;
   }
-}
-
-void setRAWData(){
-   //ROLL/PITCH/YAW/THROTTLE/AUX1/AUX2/AUX3/AUX4
-   int dataLength=read8(0);
-   int msgId=read8(1);
-   int ROLL=read16(2);
-   int PITCH=read16(4);
-   int YAW=read16(6);
-   int THROTTLE=read16(8);
-   int AUX1=read16(10);
-   int AUX2=read16(12);
-   int AUX3=read16(14);
-   int AUX4=read16(16);
-  // robotUpdateCMD(ROLL,PITCH,YAW,THROTTLE);
 }
 
 uint8_t read8(int index)  {

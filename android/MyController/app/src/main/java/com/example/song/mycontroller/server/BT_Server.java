@@ -113,8 +113,8 @@ public class BT_Server extends Service {
                 String name=device.getName();
                 if(name.equals("HMSoft")){
                     scanLeDevice(false);
-
-                    device.connectGatt(BT_Server.this,true,bluetoothGattCallback);
+                    device.connectGatt(BT_Server.this,false,bluetoothGattCallback);
+                    Log.e("name----------",name);
                 }
             }
         };
@@ -142,6 +142,7 @@ public class BT_Server extends Service {
 
                 for(BluetoothGattService gatt_service : gatt.getServices()){
                     for(BluetoothGattCharacteristic gatt_chara : gatt_service.getCharacteristics()){
+                        Log.e("**",gatt_chara.getUuid()+"");
                         if(gatt_chara.getUuid().equals(MY_UUID)){
                             Log.e("info",gatt_chara.getUuid()+"get a ble deviceff");
                             serialChara=gatt_chara;
@@ -156,17 +157,27 @@ public class BT_Server extends Service {
             @Override
             public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
                 super.onReadRemoteRssi(gatt, rssi, status);
-                odc.change(rssi+"");
+               // odc.change(rssi+"");
             }
 
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
                 super.onCharacteristicChanged(gatt, characteristic);
-                Log.e("serial","----------------------");
                 byte[] b=characteristic.getValue();
-                Log.e("[[[[[[[[[[[[",b[0]+":"+b[1]+":"+b.length);
+                //Log.e("[[[[[[[[[[[[",b[0]+":"+b[1]+":"+b.length);
+                float c=(b[0]&0xff)+((b[1]&0xff)<<8);
+                c=c*3.6f/1000;
+                Log.e("serial","----------"+c+"----------"+b.length);
+                odc.change(c+"");
             }
         };
+    }
+
+    public void readUint8(int num){
+
+    }
+    public void readUint16(int num){
+
     }
 
     @Override
@@ -192,19 +203,22 @@ public class BT_Server extends Service {
             mBluetoothAdapter.stopLeScan(leScanCallback);
         }
     }
-
+    private byte[] b={0,1};
     public void KeepWriteToBlue(){
+        b[0]=0x10;
+        b[1]=0x11;
+        serialChara.setValue(b);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 while(contented){
-                    //serialChara.setValue("fefe");
                     if(serialGatt!=null){
-                        serialGatt.readRemoteRssi();
+                      //  serialGatt.readRemoteRssi();
                     }
+
                     //serialGatt.writeCharacteristic(serialChara);
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(10);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -243,7 +257,6 @@ public class BT_Server extends Service {
         //nm.notify(0,n);
         startForeground(1, n);
     }
-
     /*
     * Binder
     * */

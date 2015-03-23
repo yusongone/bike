@@ -1,12 +1,13 @@
 #include "speed.h"
 
-
 volatile boolean dir=false;
 volatile int signal;
 volatile long oldTime;
 volatile long now;
 volatile long TotalTimeInterval=100000000;
 volatile long timeCount=0;
+volatile int stoped=1;
+
 Speed::Speed(){
 }
 
@@ -20,16 +21,20 @@ void Speed::init(){
   sei();    
 };
 
-int Speed::getCount(){
-  return 0;
-};
+void Speed::addTotalDist(int meter){
+  //EEPROM.read();
+}
+
+int Speed::getTotalDist(){
+}
 
 float Speed::getSpeed(){
   if(timeCount>MIN_TIME){
     timeCount=0;
-    TotalTimeInterval=1000000000;
+    TotalTimeInterval=2000000000;
   }
-  return (float)WHEEL_PERIMETER/(float)SPEED_POINT_COUNT/(float)(TotalTimeInterval); //   (m/s)
+  //return signal;
+  return stoped*(float)WHEEL_PERIMETER/(float)SPEED_POINT_COUNT/(float)(TotalTimeInterval); //   (m/s)
 }
 
 ISR(TIMER2_COMPA_vect){
