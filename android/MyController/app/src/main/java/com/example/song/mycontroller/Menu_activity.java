@@ -10,20 +10,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.song.mycontroller.internet.Login;
 import com.example.song.mycontroller.server.BT_Server;
 
 
 public class Menu_activity extends Activity {
     private ServiceConnection conn;
     private BT_Server bt_server=null;
+    private Login login_server;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_activity);
-
         Button osc=(Button)findViewById(R.id.osc);
         Button singleRC=(Button)findViewById(R.id.singleRC);
         Button ibeacon=(Button)findViewById(R.id.ibeacon);
+        Button login=(Button)findViewById(R.id.login);
 
         osc.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,6 +51,15 @@ public class Menu_activity extends Activity {
             public void onClick(View v) {
                 Intent intent=new Intent(Menu_activity.this,BT.class);
                 startActivity(intent);
+            }
+        });
+
+
+        login_server=new Login();
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                login_server.request();
             }
         });
     }

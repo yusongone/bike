@@ -34,4 +34,12 @@
         android:background="@color/black"
         android:text="码表"
         android:id="@+id/ibeacon" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:height="100px"
+        android:textColor="@color/white"
+        android:background="@color/black"
+        android:text="@string/login"
+        android:id="@+id/login" />
 </LinearLayout>
