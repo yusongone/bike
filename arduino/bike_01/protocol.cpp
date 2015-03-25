@@ -22,10 +22,14 @@ int startData=0;
 int subIndex=0;
 int msgId;
 uint8_t  buf[RECIVE_BUFFER_SIZE];
-//SoftwareSerial softSerial(1,2);
+SoftwareSerial softSerial(SOFTWARE_SERIAL_RX,SOFTWARE_SERIAL_TX);
+
 Speed mySpeed;
 
 void Protocol::init(){
+  Serial.println("ffpro init");
+  //mySpeed.init();
+  softSerial.begin(SOFTWARE_SERIAL_RATE);
 }
 
 
@@ -50,8 +54,28 @@ void write_speed(){
   buffer[5]=tempValue>>0&0xff;
   buffer[6]=tempValue>>8&0xff;
   buffer[7]=getSum(buffer);
-  //softSerial.write(buffer,8);
-  Serial.write(buffer,8);
+  softSerial.write(buffer,8);
+  #ifdef HARDWARE_SERIAL_TEST
+    Serial.write(buffer,8);
+  #endif
+}
+
+void write_total_dist(){
+  int tempValue=mySpeed.getTotalDist();
+  tempValue=1234;
+  byte buffer[8];
+  buffer[0]=0x24;
+  buffer[1]=0x42;
+  buffer[2]=0x3C;
+  buffer[3]=0x02;
+  buffer[4]=201;
+  buffer[5]=tempValue>>0&0xff;
+  buffer[6]=tempValue>>8&0xff;
+  buffer[7]=getSum(buffer);
+  softSerial.write(buffer,8);
+  #ifdef HARDWARE_SERIAL_TEST
+    Serial.write(buffer,8);
+  #endif
 }
 
 

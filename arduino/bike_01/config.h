@@ -8,6 +8,17 @@
 
 #define HARDWARE_SERIAL_RATE 9600
 
-#define SOFTDWARE_SERIAL_RATE 9600
-#define SOFTDWARE_SERIAL_RX 11
-#define SOFTDWARE_SERIAL_TX 10
+#define SOFTWARE_SERIAL_RATE 9600
+#define SOFTWARE_SERIAL_RX 11
+#define SOFTWARE_SERIAL_TX 10
+
+#define HARDWARE_SERIAL_TEST false
+
+
+
+/*
+eeprom
+1-3 total dist //uint 32   $val/10=km  //max 1677721.5km
+2-5 trip dist  //uint 16   $val/10=km
+6   max-speed  //uint8     $val m/s
+*/

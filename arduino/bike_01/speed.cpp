@@ -6,8 +6,21 @@ volatile long oldTime;
 volatile long now;
 volatile long TotalTimeInterval=100000000;
 volatile long timeCount=0;
-volatile int stoped=1;
 
+int checkCounter=0;
+int uploadDist=0;
+
+long _getTotalDist(){
+  return (EEPROM.read(1)<<0&0xff)+(EEPROM.read(2)<<8&0xff)+(EEPROM.read(3)<<16&0xff);
+}
+
+void addTotalDist(int meter){
+  meter/=100;
+  //EEPROM.read();
+  meter+=_getTotalDist();
+  Serial.print("m");
+}
+ 
 Speed::Speed(){
 }
 
@@ -21,11 +34,18 @@ void Speed::init(){
   sei();    
 };
 
-void Speed::addTotalDist(int meter){
-  //EEPROM.read();
-}
+
 
 int Speed::getTotalDist(){
+  return _getTotalDist();
+}
+
+void addTripDist(){
+
+}
+
+int Speed::getTripDist(){
+  return 1;
 }
 
 float Speed::getSpeed(){
@@ -34,8 +54,22 @@ float Speed::getSpeed(){
     TotalTimeInterval=2000000000;
   }
   //return signal;
-  return stoped*(float)WHEEL_PERIMETER/(float)SPEED_POINT_COUNT/(float)(TotalTimeInterval); //   (m/s)
+  return (float)WHEEL_PERIMETER/(float)SPEED_POINT_COUNT/(float)(TotalTimeInterval); //   (m/s)
 }
+
+void onOneCheck(){
+  if(checkCounter==0){//one lap
+    checkCounter=SPEED_POINT_COUNT;
+    uploadDist+=WHEEL_PERIMETER;
+    if(uploadDist>1000*100){
+      addTotalDist(100);
+      uploadDist-=1000*100;
+    }
+  }else{
+    checkCounter--;
+  }
+}
+
 
 ISR(TIMER2_COMPA_vect){
   cli();
@@ -47,6 +81,7 @@ ISR(TIMER2_COMPA_vect){
         dir=false;
         TotalTimeInterval=timeCount;
         timeCount=0;
+        onOneCheck();
     };
     timeCount+=now-oldTime;
     oldTime=now;

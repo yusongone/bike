@@ -5,6 +5,7 @@
 
 #include "Arduino.h"
 #include "config.h"
+#include "EEPROM.h"
 
 class Speed{
   public :
@@ -12,11 +13,10 @@ class Speed{
     float getSpeed();
     void init();
     
-    void addTotalDist(int meter);
     int getTotalDist();
    
     void writeOnceDist();
-    void getOnceDist();
+    int getTripDist();
     void clearOnceDist(); 
    
   private :

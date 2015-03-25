@@ -4,17 +4,18 @@
 
 //SoftwareSerial mySerial(11,10);
 Protocol protocol;
+Speed speedd;
 void setup(){
-//eeprom_read_block(1,2);
-Serial.begin(9600);
-//mySerial.begin(9600);
-
-
-  
+  Serial.begin(9600);
+  protocol.init();
 }
 
 void loop(){
   protocol.reciveCMD();
+  
+  Serial.print(speedd.getTotalDist());
+  delay(1000);
+  
 }
 
 
