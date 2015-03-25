@@ -12,12 +12,14 @@ import android.widget.Button;
 
 import com.example.song.mycontroller.internet.Login;
 import com.example.song.mycontroller.server.BT_Server;
+import com.example.song.mycontroller.server.DB_Server;
 
 
 public class Menu_activity extends Activity {
     private ServiceConnection conn;
     private BT_Server bt_server=null;
     private Login login_server;
+    private DB_Server db_server=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +28,7 @@ public class Menu_activity extends Activity {
         Button singleRC=(Button)findViewById(R.id.singleRC);
         Button ibeacon=(Button)findViewById(R.id.ibeacon);
         Button login=(Button)findViewById(R.id.login);
+        Button db=(Button)findViewById(R.id.DB);
 
         osc.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,6 +63,13 @@ public class Menu_activity extends Activity {
             @Override
             public void onClick(View v) {
                 login_server.request();
+            }
+        });
+        //db_server=new DB_Server(this,"",);
+        db.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db_server.test();
             }
         });
     }

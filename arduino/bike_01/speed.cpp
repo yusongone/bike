@@ -9,18 +9,47 @@ volatile long timeCount=0;
 
 int checkCounter=0;
 int uploadDist=0;
-
+//------------------------- total dist---------------------------------
 long _getTotalDist(){
   return (EEPROM.read(1)<<0&0xff)+(EEPROM.read(2)<<8&0xff)+(EEPROM.read(3)<<16&0xff);
 }
 
 void addTotalDist(int meter){
-  meter/=100;
+  meter/=10;
   //EEPROM.read();
   meter+=_getTotalDist();
-  Serial.print("m");
+  EEPROM.write(1,meter>>0);
+  EEPROM.write(2,meter>>8);
+  EEPROM.write(3,meter>>16);
+  
+}
+
+long Speed::getTotalDist(){
+  return _getTotalDist();
 }
  
+ //------------------------- trip dist---------------------------------
+int _getTripDist(){
+  return (EEPROM.read(4)<<0&0xff)+(EEPROM.read(5)<<8&0xff);
+};
+
+void addTripDist(int meter){
+  meter/=10;
+  meter+=_getTripDist();
+  EEPROM.write(4,meter>>0);
+  EEPROM.write(5,meter>>8);
+  addTotalDist(100);
+}
+
+void Speed::resetTripDist(){
+  EEPROM.write(4,0);
+  EEPROM.write(5,0);
+}
+
+int Speed::getTripDist(){
+  return _getTripDist();
+}
+
 Speed::Speed(){
 }
 
@@ -33,20 +62,6 @@ void Speed::init(){
   TIMSK2 = 0x02;     // ENABLE INTERRUPT ON MATCH BETWEEN TIMER2 AND OCR2A
   sei();    
 };
-
-
-
-int Speed::getTotalDist(){
-  return _getTotalDist();
-}
-
-void addTripDist(){
-
-}
-
-int Speed::getTripDist(){
-  return 1;
-}
 
 float Speed::getSpeed(){
   if(timeCount>MIN_TIME){
@@ -62,7 +77,7 @@ void onOneCheck(){
     checkCounter=SPEED_POINT_COUNT;
     uploadDist+=WHEEL_PERIMETER;
     if(uploadDist>1000*100){
-      addTotalDist(100);
+      addTripDist(100);//add
       uploadDist-=1000*100;
     }
   }else{

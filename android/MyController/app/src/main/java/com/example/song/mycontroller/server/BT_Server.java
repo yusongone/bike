@@ -23,6 +23,8 @@ import android.util.Log;
 import com.example.song.mycontroller.BT;
 import com.example.song.mycontroller.Menu_activity;
 import com.example.song.mycontroller.R;
+import com.example.song.mycontroller.multiwii.MyBuf;
+import com.example.song.mycontroller.multiwii.Protocol;
 
 import java.util.UUID;
 
@@ -43,6 +45,8 @@ public class BT_Server extends Service {
     private BluetoothGattCharacteristic serialChara=null;
     private BluetoothGatt serialGatt=null;
     private Message msg;
+    private Protocol protocol;
+    private byte[] getSpeedByte;
 
 
 
@@ -64,7 +68,9 @@ public class BT_Server extends Service {
         super.onCreate();
         binder=new BT_binder();
         mHandler=new Handler();
-        Log.e("create","---------------------");
+        protocol=new Protocol();
+        getSpeedByte=protocol.getSpeed();
+        Log.e("create","---------------------"+getSpeedByte.length);
         initBluetooth();
     }
 
@@ -165,10 +171,8 @@ public class BT_Server extends Service {
                 super.onCharacteristicChanged(gatt, characteristic);
                 byte[] b=characteristic.getValue();
                 //Log.e("[[[[[[[[[[[[",b[0]+":"+b[1]+":"+b.length);
-                float c=(b[0]&0xff)+((b[1]&0xff)<<8);
-                c=c*3.6f/1000;
-                Log.e("serial","----------"+c+"----------"+b.length);
-                odc.change(c+"");
+                protocol.switchCMD(b);
+                Log.e("serial","----------"+b.length);
             }
         };
     }
@@ -203,11 +207,8 @@ public class BT_Server extends Service {
             mBluetoothAdapter.stopLeScan(leScanCallback);
         }
     }
-    private byte[] b={0,1};
+
     public void KeepWriteToBlue(){
-        b[0]=0x10;
-        b[1]=0x11;
-        serialChara.setValue(b);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -215,10 +216,10 @@ public class BT_Server extends Service {
                     if(serialGatt!=null){
                       //  serialGatt.readRemoteRssi();
                     }
-
-                    //serialGatt.writeCharacteristic(serialChara);
+                    serialChara.setValue(getSpeedByte);
+                    serialGatt.writeCharacteristic(serialChara);
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(2000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

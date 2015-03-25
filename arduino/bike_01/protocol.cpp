@@ -27,7 +27,6 @@ SoftwareSerial softSerial(SOFTWARE_SERIAL_RX,SOFTWARE_SERIAL_TX);
 Speed mySpeed;
 
 void Protocol::init(){
-  Serial.println("ffpro init");
   //mySpeed.init();
   softSerial.begin(SOFTWARE_SERIAL_RATE);
 }
@@ -44,7 +43,6 @@ byte getSum(byte b[]){
 
 void write_speed(){
   int tempValue=mySpeed.getSpeed();
-  tempValue=1234;
   byte buffer[8];
   buffer[0]=0x24;
   buffer[1]=0x42;
@@ -61,17 +59,18 @@ void write_speed(){
 }
 
 void write_total_dist(){
-  int tempValue=mySpeed.getTotalDist();
-  tempValue=1234;
-  byte buffer[8];
+  long tempValue=mySpeed.getTotalDist();
+  Serial.println(tempValue);
+  byte buffer[9];
   buffer[0]=0x24;
   buffer[1]=0x42;
   buffer[2]=0x3C;
-  buffer[3]=0x02;
-  buffer[4]=201;
+  buffer[3]=0x03;
+  buffer[4]=203;
   buffer[5]=tempValue>>0&0xff;
   buffer[6]=tempValue>>8&0xff;
-  buffer[7]=getSum(buffer);
+  buffer[7]=tempValue>>16&0xff;
+  buffer[8]=getSum(buffer);
   softSerial.write(buffer,8);
   #ifdef HARDWARE_SERIAL_TEST
     Serial.write(buffer,8);
@@ -83,6 +82,9 @@ void switchCMD(){
    switch (msgId){
     case GET_SPEED:
       write_speed();      
+    break;
+    case GET_TOTAL_DISTANCE:
+      write_total_dist();      
     break;
     case TEST:
     break;
@@ -103,9 +105,10 @@ boolean checkSum(){
 
 
 void Protocol::reciveCMD(){
-  int dl=Serial.available();
+  int dl=softSerial.available();
   while(dl--){
-    byte tempByte=Serial.read();
+    byte tempByte=softSerial.read();
+    Serial.println(tempByte);
     if(startData==1){//get dataLength;
       dataLength=(int)tempByte;
       buf[subIndex++]=dataLength;

@@ -13,7 +13,6 @@ void setup(){
 void loop(){
   protocol.reciveCMD();
   
-  Serial.print(speedd.getTotalDist());
   delay(1000);
   
 }
