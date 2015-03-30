@@ -27,7 +27,7 @@ SoftwareSerial softSerial(SOFTWARE_SERIAL_RX,SOFTWARE_SERIAL_TX);
 Speed mySpeed;
 
 void Protocol::init(){
-  //mySpeed.init();
+  mySpeed.init();
   softSerial.begin(SOFTWARE_SERIAL_RATE);
 }
 
@@ -42,7 +42,10 @@ byte getSum(byte b[]){
 }
 
 void write_speed(){
-  int tempValue=mySpeed.getSpeed();
+  int tempValue=(mySpeed.getSpeed()*36);
+  //tempValue=2401;
+  Serial.println(tempValue);
+  Serial.println("");
   byte buffer[8];
   buffer[0]=0x24;
   buffer[1]=0x42;
@@ -60,6 +63,7 @@ void write_speed(){
 
 void write_total_dist(){
   long tempValue=mySpeed.getTotalDist();
+  Serial.print("--------------------------");
   Serial.println(tempValue);
   byte buffer[9];
   buffer[0]=0x24;

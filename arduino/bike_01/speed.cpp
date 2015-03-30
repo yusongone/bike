@@ -11,6 +11,12 @@ int checkCounter=0;
 int uploadDist=0;
 //------------------------- total dist---------------------------------
 long _getTotalDist(){
+  Serial.print("1-------------");
+  Serial.println(EEPROM.read(1)<<0&0xff);
+  Serial.print("2-------------");
+  Serial.println(EEPROM.read(2)<<8&0xff);
+  Serial.print("3-------------");
+  Serial.println(EEPROM.read(3)<<16&0xff);
   return (EEPROM.read(1)<<0&0xff)+(EEPROM.read(2)<<8&0xff)+(EEPROM.read(3)<<16&0xff);
 }
 
@@ -18,6 +24,14 @@ void addTotalDist(int meter){
   meter/=10;
   //EEPROM.read();
   meter+=_getTotalDist();
+    Serial.print("0-------------");
+  Serial.println(meter);
+  Serial.print("1-------------");
+  Serial.println(meter>>0&0xff);
+  Serial.print("2-------------");
+  Serial.println(meter>>8&0xff);
+  Serial.print("3-------------");
+  Serial.println(meter>>16&0xff);
   EEPROM.write(1,meter>>0);
   EEPROM.write(2,meter>>8);
   EEPROM.write(3,meter>>16);
@@ -39,7 +53,7 @@ void addTripDist(int meter){
   EEPROM.write(4,meter>>0);
   EEPROM.write(5,meter>>8);
   addTotalDist(100);
-}
+};
 
 void Speed::resetTripDist(){
   EEPROM.write(4,0);
@@ -77,6 +91,7 @@ void onOneCheck(){
     checkCounter=SPEED_POINT_COUNT;
     uploadDist+=WHEEL_PERIMETER;
     if(uploadDist>1000*100){
+      Serial.print("0000000000000000000000000");
       addTripDist(100);//add
       uploadDist-=1000*100;
     }

@@ -12,7 +12,7 @@
 #define SOFTWARE_SERIAL_RX 11
 #define SOFTWARE_SERIAL_TX 10
 
-#define HARDWARE_SERIAL_TEST false
+//#define HARDWARE_SERIAL_TEST
 
 
 

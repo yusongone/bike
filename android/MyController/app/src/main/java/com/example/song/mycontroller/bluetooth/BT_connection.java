@@ -41,8 +41,9 @@ public class BT_connection extends BluetoothGattCallback{
                 String name=device.getName();
                 Log.e("scan","fefeffefefe");
                 if(name.equals("HMSoft")){
+
                     scanLeDevice(false);
-                    device.connectGatt(context, false, getGattCallback());
+                    device.connectGatt(context, true, getGattCallback());
                 }
             }
 
@@ -70,6 +71,9 @@ public class BT_connection extends BluetoothGattCallback{
         if (enable) {
             if(!myScaning){
                 myScaning=true;
+                if(serialGatt!=null){
+                    serialGatt.close();
+                }
 
                 Log.e("scan","i will scan");
                 bluetoothAdapter.startLeScan(leScanCallback);
@@ -159,5 +163,6 @@ public class BT_connection extends BluetoothGattCallback{
         protected void connectStateChange(int state){ }
         protected void haveGoods(byte[] b){  }
         protected void getSerialChara(){}
+
     }
 }

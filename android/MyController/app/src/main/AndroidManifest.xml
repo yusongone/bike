@@ -26,6 +26,7 @@
         </activity>
         <activity
             android:name="com.example.song.mycontroller.activity_box.Menu_activity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_menu_activity"
             android:screenOrientation="locked" >
             <intent-filter>
@@ -47,6 +48,7 @@
 
         <activity
             android:name="com.example.song.mycontroller.activity_box.Dashboard"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape"
             android:label="@string/title_activity_bt" >
         </activity>

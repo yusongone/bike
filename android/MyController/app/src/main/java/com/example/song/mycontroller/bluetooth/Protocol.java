@@ -34,7 +34,7 @@ public class Protocol{
 
     private void got_speed(byte[] bytes){
         int d=(bytes[5]<<0&0xff)+(bytes[6]<<8);
-        onAction.speedChange((float)d/100);
+        onAction.speedChange((float)d/10);
     }
 
     private void got_trip_dist(byte[] bytes){
@@ -43,11 +43,15 @@ public class Protocol{
     }
 
     private void got_total_dist(byte[] bytes){
-        int d=(bytes[5]<<0&0xff)+(bytes[6]<<8)+(bytes[7]<<16);
+        int d=(bytes[5]<<0&0xff)+(bytes[6]<<8&0xff)+(bytes[7]<<16&0xff);
+        Log.e("1",(bytes[5]<<0&0xff)+"");
+        Log.e("2",(bytes[6]<<8&0xff)+"");
+        Log.e("3",(bytes[7]<<16&0xff)+"");
         onAction.totalDistChange(d);
     }
 
     public byte[] requestTotalDist(){
+        Log.e("request","request total");
         MyBuf mb=new MyBuf(2);
         mb.writeUInt8(0,0);//data length
         mb.writeUInt8(GET_TOTAL_DIST,1); // mesId according to multiwii serial protocol   http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
@@ -55,6 +59,7 @@ public class Protocol{
     }
 
     public byte[] requestTripDist(){
+        Log.e("request","request trip");
         MyBuf mb=new MyBuf(2);
         mb.writeUInt8(0,0);//data length
         mb.writeUInt8(GET_TRIP_DIST,1); // mesId according to multiwii serial protocol   http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol

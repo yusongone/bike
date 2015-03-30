@@ -89,7 +89,7 @@ public class Dashboard extends Activity {
                         blueStatus.post(new Runnable() {
                             @Override
                             public void run() {
-                                String a = new DecimalFormat("###,###,###.##").format(num);
+                                String a = new DecimalFormat("######.#").format(num);
                                 speedText.setText(a);
                             }
                         });

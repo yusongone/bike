@@ -23,10 +23,18 @@ public class MyDatabase extends SQLiteOpenHelper {
         dataBuffer=new DataBuffer();
         dataBuffer.OnActionListener(new DataBuffer.OnAction(){
             @Override
-            protected void onBufferReady(String[] f, int length) {
-                super.onBufferReady(f, length);
-                Log.e("update ------","2222");
-                parsePoint(f,length);
+            protected void onBufferReady(String[] f) {
+                super.onBufferReady(f);
+                Log.e("MyDatabase","bufferReady");
+                parsePoint(f);
+                table_record.getRecordPoint();
+            }
+
+            @Override
+            protected void onNewData() {
+                super.onNewData();
+                Log.e("MyDatabase","new row");
+                table_record.newRecordRow();
             }
         });
     }
@@ -40,19 +48,18 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     }
 
-    private void parsePoint(String[] f,int _length){
+    private void parsePoint(String[] f){
         String newStr="";
-        for(int i=0;i<_length;i++){
+        for(int i=0;i<f.length;i++){
             newStr+=f[i]+",";
         }
         String str=table_record.getRecordPoint();
         table_record.updateRecordPoint(str+newStr);
     }
 
-    public void test(SQLiteDatabase db){
+    public void startRecord(SQLiteDatabase db){
         table_record=new Record(db);
-        table_record.applyAliveRecordRow();
-        table_record.getRecordPoint();
+        table_record.newRecordRow();
     }
 
     public void addPoint(float speed){
@@ -73,7 +80,7 @@ public class MyDatabase extends SQLiteOpenHelper {
             db.execSQL(sql);
         }
 
-        public void applyAliveRecordRow(){
+        public void newRecordRow(){
             Time t=new Time(); // or Time t=new Time("GMT+8"); 加上Time Zone资料。
             t.setToNow(); // 取得系统时间。
             int year = t.year;
@@ -87,8 +94,9 @@ public class MyDatabase extends SQLiteOpenHelper {
             cv.put("startTime",year+"-"+month+"-"+date+" "+hour+":"+minute+":"+second);
             cv.put("recordPoint","");
             nowAliveRow=db.insert("record",null,cv);
-            Log.e("MYDATAbase",""+nowAliveRow);
+            Log.e("*******************************************MYDATAbase",""+nowAliveRow);
         }
+
         public void updateRecordPoint(String str){
             ContentValues cv=new ContentValues();
             cv.put("recordPoint",str);
