@@ -1,13 +1,9 @@
 package com.example.song.mycontroller.common;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
-
-import com.example.song.mycontroller.Single_RC;
 
 /**
  * Created by song on 15/1/20.

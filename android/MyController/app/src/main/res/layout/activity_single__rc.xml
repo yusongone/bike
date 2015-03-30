@@ -7,7 +7,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@color/black"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.example.song.mycontroller.Single_RC">
+    tools:context="com.example.song.mycontroller.activity_box.Single_RC">
 
     <com.example.song.mycontroller.Rocker
         android:id="@+id/single_RC"

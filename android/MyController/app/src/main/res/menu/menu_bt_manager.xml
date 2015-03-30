@@ -1,5 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" tools:context="com.example.song.mycontroller.activity_box.Dashboard">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.song.mycontroller.activity_box.BT_manager">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" android:showAsAction="never" />
 </menu>

@@ -4,4 +4,5 @@
     <color name="black">#000000</color>
     <color name="blue_a">#ff1ef0ff</color>
     <color name="blue_b">#ff005fff</color>
+    <color name="trans">#00000000</color>
 </resources>

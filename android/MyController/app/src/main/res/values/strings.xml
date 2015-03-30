@@ -17,5 +17,7 @@
     <string name="double_RC">双指遥控</string>
     <string name="title_activity_bt">BT</string>
     <string name="login">登陆</string>
+    <string name="title_activity_bt_manager">BT_manager</string>
+    <string name="title_activity_login">Login</string>
 
 </resources>

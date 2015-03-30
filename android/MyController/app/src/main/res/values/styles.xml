@@ -13,13 +13,13 @@
         <item name="android:layout_centerHorizontal">@android:color/holo_green_light</item>
     </style>
 
+
     <style name="rocker" />
 
     <style name="FullscreenTheme" parent="android:Theme.NoTitleBar">
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowBackground">@null</item>
         <item name="metaButtonBarStyle">@style/ButtonBar</item>
-        <item name="metaButtonBarButtonStyle">@style/ButtonBarButton</item>
     </style>
 
     <style name="ButtonBar">
@@ -30,6 +30,9 @@
         <item name="android:background">@android:drawable/bottom_bar</item>
     </style>
 
-    <style name="ButtonBarButton" />
+    <style name="text_center" >
+        <item name="android:background">@color/trans</item>
+        <item name="android:gravity">center</item>
+    </style>
 
 </resources>

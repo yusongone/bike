@@ -15,20 +15,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/logo_482"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name="com.example.song.mycontroller.MainActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape" >
-        </activity>
-        <activity
-            android:name="com.example.song.mycontroller.HomePage"
-            android:label="@string/title_activity_internet"
-            android:screenOrientation="locked" >
-        </activity>
         <activity
             android:name="com.example.song.mycontroller.OSC_box"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -36,7 +25,7 @@
             android:theme="@style/FullscreenTheme" >
         </activity>
         <activity
-            android:name="com.example.song.mycontroller.Menu_activity"
+            android:name="com.example.song.mycontroller.activity_box.Menu_activity"
             android:label="@string/title_activity_menu_activity"
             android:screenOrientation="locked" >
             <intent-filter>
@@ -46,23 +35,28 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.song.mycontroller.Single_RC"
+            android:name="com.example.song.mycontroller.activity_box.Single_RC"
             android:label="@string/title_activity_single__rc" >
-        </activity>
-        <activity
-            android:name="com.example.song.mycontroller.IbeaconTest"
-            android:label="@string/title_activity_ibeacon_test" >
         </activity>
 
         <service
-            android:name="com.example.song.mycontroller.server.BT_Server"
+            android:name="com.example.song.mycontroller.server.Main_server"
             android:enabled="true"
             android:exported="true" >
         </service>
 
         <activity
-            android:name="com.example.song.mycontroller.BT"
+            android:name="com.example.song.mycontroller.activity_box.Dashboard"
+            android:screenOrientation="landscape"
             android:label="@string/title_activity_bt" >
+        </activity>
+        <activity
+            android:name="com.example.song.mycontroller.activity_box.BT_manager"
+            android:label="@string/title_activity_bt_manager" >
+        </activity>
+        <activity
+            android:name="com.example.song.mycontroller.activity_box.Login"
+            android:label="@string/title_activity_login" >
         </activity>
     </application>
 

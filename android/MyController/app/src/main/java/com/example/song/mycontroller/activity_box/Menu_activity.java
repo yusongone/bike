@@ -1,25 +1,25 @@
-package com.example.song.mycontroller;
+package com.example.song.mycontroller.activity_box;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.song.mycontroller.OSC_box;
+import com.example.song.mycontroller.R;
+import com.example.song.mycontroller.server.Main_server;
+import com.example.song.mycontroller.database.MyDatabase;
 import com.example.song.mycontroller.internet.Login;
-import com.example.song.mycontroller.server.BT_Server;
-import com.example.song.mycontroller.server.DB_Server;
 
 
 public class Menu_activity extends Activity {
     private ServiceConnection conn;
-    private BT_Server bt_server=null;
+    private Main_server mainserver =null;
     private Login login_server;
-    private DB_Server db_server=null;
+    private MyDatabase myDatabase=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,24 +52,22 @@ public class Menu_activity extends Activity {
         ibeacon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(Menu_activity.this,BT.class);
+                Intent intent=new Intent(Menu_activity.this,Dashboard.class);
                 startActivity(intent);
             }
         });
 
 
-        login_server=new Login();
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 login_server.request();
             }
         });
-        //db_server=new DB_Server(this,"",);
         db.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db_server.test();
+                float[] a=new float[10];
             }
         });
     }

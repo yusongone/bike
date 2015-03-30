@@ -1,9 +1,12 @@
-package com.example.song.mycontroller;
+package com.example.song.mycontroller.activity_box;
 
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+
+import com.example.song.mycontroller.R;
+import com.example.song.mycontroller.Rocker;
 import com.example.song.mycontroller.common.MySensor.SensorData;
 import android.util.Log;
 import android.view.Menu;
