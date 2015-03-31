@@ -20,7 +20,7 @@ public class MyBuf {
         buf[index]=(byte)((num>>0)&0xff);
     }
     public byte[] merge(){
-        mergeBuf=new byte[buf.length+4];// 3 from sendHeader 1 from sum
+        mergeBuf=new byte[buf.length+8];// 3 from sendHeader 1 from sum
         mergeBuf[0]=0x24;
         mergeBuf[1]=0x42;
         mergeBuf[2]=0x3C;
@@ -28,6 +28,10 @@ public class MyBuf {
             mergeBuf[i+3]=buf[i];
         }
         mergeBuf[buf.length+3]=checkSum(buf);
+        mergeBuf[buf.length+4]=0x00;
+        mergeBuf[buf.length+5]=0x00;
+        mergeBuf[buf.length+6]=0x00;
+        mergeBuf[buf.length+7]=0x00;
         return mergeBuf;
     }
     private byte checkSum(byte[] buf){

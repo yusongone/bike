@@ -12,9 +12,6 @@ void setup(){
 
 void loop(){
   protocol.reciveCMD();
-  
-  delay(1000);
-  
 }
 
 

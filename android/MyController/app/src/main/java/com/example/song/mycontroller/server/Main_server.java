@@ -20,6 +20,7 @@ import com.example.song.mycontroller.bluetooth.Protocol;
 import com.example.song.mycontroller.database.MyDatabase;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 
 public class Main_server extends Service {
@@ -37,6 +38,7 @@ public class Main_server extends Service {
     private Message msg;
 
     private int cmdStatus;
+    private MyDatabase.Point pointModel;
 
 
     @Override
@@ -44,6 +46,7 @@ public class Main_server extends Service {
         super.onCreate();
         bt_connection=new BT_connection((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE) ,this);
         protocol=new Protocol();
+        pointModel=new MyDatabase.Point();
         myDatabase=new MyDatabase(this,"df",null,1);
         SQLiteDatabase db=myDatabase.getWritableDatabase();
         myDatabase.startRecord(db);
@@ -51,6 +54,7 @@ public class Main_server extends Service {
         initProtocolAction();
         bindActionToBT();
         runForeground();
+
     }
 
     private void initProtocolAction(){
@@ -58,13 +62,15 @@ public class Main_server extends Service {
             @Override
             protected void speedChange(float num) {
                 super.speedChange(num);
+                pointModel.set_speed(num);
                 myDatabase.addPoint(num);
                 speed=num;
                 onAction.speedChange(num);
+                Log.e("*****","speed change"+num);
             }
 
             @Override
-            protected void tripDistChange(int num) {
+            protected void tripDistChange(float num) {
                 super.tripDistChange(num);
                 Log.e("*****","trip dist change"+num);
             }
@@ -73,6 +79,12 @@ public class Main_server extends Service {
             protected void totalDistChange(int num) {
                 super.totalDistChange(num);
                 Log.e("*****","total dist change"+num);
+            }
+
+            @Override
+            protected void airChange(float num) {
+                super.airChange(num);
+                pointModel.set_air(num);
             }
         });
     }
@@ -83,11 +95,12 @@ public class Main_server extends Service {
             public void run() {
                 Log.e("Main_server","start request data from bt drive");
                 while (bluetoothStates==2){
-                   // bt_connection.writeCharacteristic(protocol.requestSpeed());
-                    bt_connection.writeCharacteristic(protocol.requestTotalDist());
-                    //bt_connection.writeCharacteristic(protocol.requestTripDist());
+                    byte[] tempa=bt_connection.mergeCMD(protocol.requestSpeed(),protocol.requestTripDist());
+                    byte[] finCMD=bt_connection.mergeCMD(tempa,protocol.requestTotalDist());
+                    //Log.e("fe","finCMD"+finCMD.length);
+                    bt_connection.writeCharacteristic(finCMD);
                     try {
-                        Thread.sleep(4*1000);
+                        Thread.sleep(8*1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

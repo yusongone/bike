@@ -21,12 +21,14 @@ int dataLength=-1;
 int startData=0;
 int subIndex=0;
 int msgId;
+boolean Hard=true;
 uint8_t  buf[RECIVE_BUFFER_SIZE];
-SoftwareSerial softSerial(SOFTWARE_SERIAL_RX,SOFTWARE_SERIAL_TX);
+SoftwareSerial softSerial =  SoftwareSerial(SOFTWARE_SERIAL_RX, SOFTWARE_SERIAL_TX);
 
 Speed mySpeed;
 
 void Protocol::init(){
+  pinMode(13,OUTPUT);
   mySpeed.init();
   softSerial.begin(SOFTWARE_SERIAL_RATE);
 }
@@ -43,42 +45,60 @@ byte getSum(byte b[]){
 
 void write_speed(){
   int tempValue=(mySpeed.getSpeed()*36);
-  //tempValue=2401;
-  Serial.println(tempValue);
-  Serial.println("");
+  tempValue=1;
   byte buffer[8];
   buffer[0]=0x24;
   buffer[1]=0x42;
   buffer[2]=0x3C;
   buffer[3]=0x02;
-  buffer[4]=201;
+  buffer[4]=GET_SPEED;
   buffer[5]=tempValue>>0&0xff;
   buffer[6]=tempValue>>8&0xff;
   buffer[7]=getSum(buffer);
-  softSerial.write(buffer,8);
-  #ifdef HARDWARE_SERIAL_TEST
+  if(Hard){
     Serial.write(buffer,8);
-  #endif
+  }else{
+    softSerial.write(buffer,8);
+  }
 }
 
 void write_total_dist(){
   long tempValue=mySpeed.getTotalDist();
-  Serial.print("--------------------------");
-  Serial.println(tempValue);
+  tempValue=1;
   byte buffer[9];
   buffer[0]=0x24;
   buffer[1]=0x42;
   buffer[2]=0x3C;
   buffer[3]=0x03;
-  buffer[4]=203;
+  buffer[4]=GET_TOTAL_DISTANCE;
   buffer[5]=tempValue>>0&0xff;
   buffer[6]=tempValue>>8&0xff;
   buffer[7]=tempValue>>16&0xff;
   buffer[8]=getSum(buffer);
-  softSerial.write(buffer,8);
-  #ifdef HARDWARE_SERIAL_TEST
+  if(Hard){
     Serial.write(buffer,8);
-  #endif
+  }else{
+    softSerial.write(buffer,9);
+  }
+}
+
+void write_trip_dist(){
+  long tempValue=mySpeed.getTripDist();
+  tempValue=1;
+  byte buffer[9];
+  buffer[0]=0x24;
+  buffer[1]=0x42;
+  buffer[2]=0x3C;
+  buffer[3]=0x03;
+  buffer[4]=GET_TRIP_DISTANCE;
+  buffer[5]=tempValue>>0&0xff;
+  buffer[6]=tempValue>>8&0xff;
+  buffer[7]=getSum(buffer);
+  if(Hard){
+    Serial.write(buffer,8);
+  }else{
+    softSerial.write(buffer,8);
+  }
 }
 
 
@@ -89,6 +109,9 @@ void switchCMD(){
     break;
     case GET_TOTAL_DISTANCE:
       write_total_dist();      
+    break;
+    case GET_TRIP_DISTANCE:
+      write_trip_dist();      
     break;
     case TEST:
     break;
@@ -109,10 +132,19 @@ boolean checkSum(){
 
 
 void Protocol::reciveCMD(){
-  int dl=softSerial.available();
+  int dl;//=softSerial.available();
+  if(Hard){
+    dl=Serial.available();
+  }else{
+    dl=softSerial.available();
+  }
   while(dl--){
-    byte tempByte=softSerial.read();
-    Serial.println(tempByte);
+    byte tempByte=Serial.read();
+     if(Hard){
+        byte tempByte=Serial.read();
+     }else{
+      byte tempByte=softSerial.read();
+      }
     if(startData==1){//get dataLength;
       dataLength=(int)tempByte;
       buf[subIndex++]=dataLength;

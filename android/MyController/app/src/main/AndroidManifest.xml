@@ -49,7 +49,6 @@
         <activity
             android:name="com.example.song.mycontroller.activity_box.Dashboard"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="landscape"
             android:label="@string/title_activity_bt" >
         </activity>
         <activity

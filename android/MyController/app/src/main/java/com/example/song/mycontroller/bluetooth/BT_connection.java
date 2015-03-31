@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.example.song.mycontroller.server.Main_server;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -30,6 +31,7 @@ public class BT_connection extends BluetoothGattCallback{
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothGattCallback myBluetoothGattCallback;
     private Context context;
+
     private boolean myScaning=false;
     private BluetoothAdapter.LeScanCallback leScanCallback;
 
@@ -39,9 +41,8 @@ public class BT_connection extends BluetoothGattCallback{
             @Override
             public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
                 String name=device.getName();
-                Log.e("scan","fefeffefefe");
+                Log.e("scan","fefeffefefe"+name);
                 if(name.equals("HMSoft")){
-
                     scanLeDevice(false);
                     device.connectGatt(context, true, getGattCallback());
                 }
@@ -143,7 +144,7 @@ public class BT_connection extends BluetoothGattCallback{
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
                 super.onCharacteristicChanged(gatt, characteristic);
                 byte[] b=characteristic.getValue();
-           //     Log.e("BT_connect","you have a bt goods");
+                Log.e("BT_connect","yffou have a bt goods");
                 onAction.haveGoods(b);
             }
         };
@@ -151,8 +152,18 @@ public class BT_connection extends BluetoothGattCallback{
     public void writeCharacteristic(byte[] b){
         if(serialChara!=null){
             serialChara.setValue(b);
+            for(int i=0;i<b.length;i++){
+                Log.e("send","---------------"+b[i]);
+            }
             serialGatt.writeCharacteristic(serialChara);
         }
+    }
+
+    public byte[] mergeCMD(byte[] a,byte[] b){
+        byte[] newCMD=new byte[a.length+b.length];
+        System.arraycopy(a, 0, newCMD, 0, a.length);
+        System.arraycopy(b, 0, newCMD, a.length, b.length);
+        return newCMD;
     }
 
     public void OnActionListener(OnAction _onAction){
@@ -163,6 +174,5 @@ public class BT_connection extends BluetoothGattCallback{
         protected void connectStateChange(int state){ }
         protected void haveGoods(byte[] b){  }
         protected void getSerialChara(){}
-
     }
 }

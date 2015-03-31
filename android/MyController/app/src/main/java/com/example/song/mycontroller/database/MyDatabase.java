@@ -115,5 +115,24 @@ public class MyDatabase extends SQLiteOpenHelper {
             return recordPoint;
         }
     }
+
+    public static class Point{
+        private float speed;
+        private float air;
+
+        public void set_speed(float _speed){
+           speed=_speed;
+        }
+        public float get_speed(){
+            return speed;
+        }
+
+        public void set_air(float _air){
+            air=_air;
+        }
+        public float get_air(){
+            return air;
+        }
+    }
 }
 

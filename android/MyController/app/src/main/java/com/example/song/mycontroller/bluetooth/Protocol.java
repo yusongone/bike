@@ -44,14 +44,10 @@ public class Protocol{
 
     private void got_total_dist(byte[] bytes){
         int d=(bytes[5]<<0&0xff)+(bytes[6]<<8&0xff)+(bytes[7]<<16&0xff);
-        Log.e("1",(bytes[5]<<0&0xff)+"");
-        Log.e("2",(bytes[6]<<8&0xff)+"");
-        Log.e("3",(bytes[7]<<16&0xff)+"");
         onAction.totalDistChange(d);
     }
 
     public byte[] requestTotalDist(){
-        Log.e("request","request total");
         MyBuf mb=new MyBuf(2);
         mb.writeUInt8(0,0);//data length
         mb.writeUInt8(GET_TOTAL_DIST,1); // mesId according to multiwii serial protocol   http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
@@ -59,7 +55,6 @@ public class Protocol{
     }
 
     public byte[] requestTripDist(){
-        Log.e("request","request trip");
         MyBuf mb=new MyBuf(2);
         mb.writeUInt8(0,0);//data length
         mb.writeUInt8(GET_TRIP_DIST,1); // mesId according to multiwii serial protocol   http://www.multiwii.com/wiki/index.php?title=Multiwii_Serial_Protocol
@@ -81,7 +76,8 @@ public class Protocol{
     public static class OnAction{
         protected void speedChange(float num){ }
         protected void totalDistChange(int num){ }
-        protected void tripDistChange(int num){ }
+        protected void tripDistChange(float num){ }
+        protected void airChange(float num){ }
     }
 }
 
