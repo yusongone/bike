@@ -95,10 +95,9 @@ public class Main_server extends Service {
             public void run() {
                 Log.e("Main_server","start request data from bt drive");
                 while (bluetoothStates==2){
-                    byte[] tempa=bt_connection.mergeCMD(protocol.requestSpeed(),protocol.requestTripDist());
-                    byte[] finCMD=bt_connection.mergeCMD(tempa,protocol.requestTotalDist());
-                    //Log.e("fe","finCMD"+finCMD.length);
-                    bt_connection.writeCharacteristic(finCMD);
+                    bt_connection.sendCMDToQueue(protocol.requestTripDist());
+                    bt_connection.sendCMDToQueue(protocol.requestTotalDist());
+                    bt_connection.sendCMDToQueue(protocol.requestSpeed());
                     try {
                         Thread.sleep(8*1000);
                     } catch (InterruptedException e) {
