@@ -139,7 +139,7 @@ public class Main_server extends Service {
             @Override
             protected void haveGoods(byte[] b) {
                 super.haveGoods(b);
-                protocol.switchCMD(b);
+                protocol.parseCMD(b);
             }
             @Override
             protected void getSerialChara() {

@@ -139,11 +139,12 @@ void Protocol::reciveCMD(){
     dl=softSerial.available();
   }
   while(dl--){
-    byte tempByte=Serial.read();
+    byte tempByte;
+    
      if(Hard){
-        byte tempByte=Serial.read();
+        tempByte=Serial.read();
      }else{
-      byte tempByte=softSerial.read();
+        tempByte=softSerial.read();
       }
     if(startData==1){//get dataLength;
       dataLength=(int)tempByte;
