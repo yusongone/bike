@@ -27,10 +27,11 @@ public class MyBuf {
         for(int i=0;i<buf.length;i++){
             mergeBuf[i+3]=buf[i];
         }
-        mergeBuf[buf.length+3]=checkSum(buf);
+        mergeBuf[buf.length+3]=Sum(buf);
         return mergeBuf;
     }
-    private byte checkSum(byte[] buf){
+
+    private byte Sum(byte[] buf){
         if(buf[0]==0){
             return buf[1];
         }else{

@@ -76,7 +76,7 @@ public class Main_server extends Service {
             }
 
             @Override
-            protected void totalDistChange(int num) {
+            protected void totalDistChange(long num) {
                 super.totalDistChange(num);
                 Log.e("*****","total dist change"+num);
             }
@@ -99,7 +99,7 @@ public class Main_server extends Service {
                     bt_connection.sendCMDToQueue(protocol.requestTotalDist());
                     bt_connection.sendCMDToQueue(protocol.requestSpeed());
                     try {
-                        Thread.sleep(8*1000);
+                        Thread.sleep(5*1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

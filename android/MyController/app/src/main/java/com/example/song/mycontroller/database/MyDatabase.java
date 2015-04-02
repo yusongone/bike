@@ -52,6 +52,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         String newStr="";
         for(int i=0;i<f.length;i++){
             newStr+=f[i]+",";
+            //[100,102,43,195]
         }
         String str=table_record.getRecordPoint();
         table_record.updateRecordPoint(str+newStr);

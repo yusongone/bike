@@ -149,11 +149,9 @@ public class BT_connection extends BluetoothGattCallback{
                 super.onCharacteristicChanged(gatt, characteristic);
                 byte[] b=characteristic.getValue();
                 Log.e("BT_connect","yffou have a bt goods");
-                /*
                 for(int i=0;i<b.length;i++){
-                        Log.e("get","---------------"+b[i]);
+                        Log.e("get","---------------"+(b[i]&0xff));
                 }
-                */
                 onAction.haveGoods(b);
             }
 

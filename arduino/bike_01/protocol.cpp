@@ -16,7 +16,7 @@
 #define GET_TOTAL_DISTANCE 203
 
 
-String headString;
+String headString="";
 int dataLength=-1;
 int startData=0;
 int subIndex=0;
@@ -37,15 +37,15 @@ void Protocol::init(){
 byte getSum(byte b[]){
   byte temp=0x00;
   int length=b[3];
-  for(int i=3;i<4+length;i++){
-    temp^=b[i]&0xff;
+  for(int i=3;i<5+length;i++){
+    temp^=(b[i]&0xff);
   }
   return temp;
 }
 
 void write_speed(){
   int tempValue=(mySpeed.getSpeed()*36);
-  tempValue=1;
+  tempValue=1350;
   byte buffer[8];
   buffer[0]=0x24;
   buffer[1]=0x42;
@@ -55,16 +55,12 @@ void write_speed(){
   buffer[5]=tempValue>>0&0xff;
   buffer[6]=tempValue>>8&0xff;
   buffer[7]=getSum(buffer);
-  if(Hard){
-    Serial.write(buffer,8);
-  }else{
-    softSerial.write(buffer,8);
-  }
+  Serial.write(buffer,8);
 }
 
 void write_total_dist(){
   long tempValue=mySpeed.getTotalDist();
-  tempValue=1;
+  tempValue=127894;
   byte buffer[9];
   buffer[0]=0x24;
   buffer[1]=0x42;
@@ -75,30 +71,22 @@ void write_total_dist(){
   buffer[6]=tempValue>>8&0xff;
   buffer[7]=tempValue>>16&0xff;
   buffer[8]=getSum(buffer);
-  if(Hard){
-    Serial.write(buffer,8);
-  }else{
-    softSerial.write(buffer,9);
-  }
+  Serial.write(buffer,9);
 }
 
 void write_trip_dist(){
   long tempValue=mySpeed.getTripDist();
-  tempValue=1;
-  byte buffer[9];
+  tempValue=65534;
+  byte buffer[8];
   buffer[0]=0x24;
   buffer[1]=0x42;
   buffer[2]=0x3C;
-  buffer[3]=0x03;
+  buffer[3]=0x02;
   buffer[4]=GET_TRIP_DISTANCE;
   buffer[5]=tempValue>>0&0xff;
   buffer[6]=tempValue>>8&0xff;
   buffer[7]=getSum(buffer);
-  if(Hard){
-    Serial.write(buffer,8);
-  }else{
-    softSerial.write(buffer,8);
-  }
+  Serial.write(buffer,8);
 }
 
 
@@ -132,20 +120,9 @@ boolean checkSum(){
 
 
 void Protocol::reciveCMD(){
-  int dl;//=softSerial.available();
-  if(Hard){
-    dl=Serial.available();
-  }else{
-    dl=softSerial.available();
-  }
-  while(dl--){
-    byte tempByte;
-    
-     if(Hard){
-        tempByte=Serial.read();
-     }else{
-        tempByte=softSerial.read();
-      }
+  //int dl=Serial.available();
+  while(Serial.available()>0){
+    byte tempByte=Serial.read();
     if(startData==1){//get dataLength;
       dataLength=(int)tempByte;
       buf[subIndex++]=dataLength;
@@ -155,7 +132,8 @@ void Protocol::reciveCMD(){
       buf[subIndex++]=msgId;
       startData++;
     }else if(startData>2){ 
-        if(dataLength==-1){
+        if(dataLength==0){
+          buf[subIndex++]=tempByte;
           if(checkSum()){
             switchCMD();
           };
@@ -165,11 +143,11 @@ void Protocol::reciveCMD(){
             buf[subIndex++]=tempByte;
             dataLength--;
         }
-    }
-    if(tempByte=='$'||tempByte=='B'||tempByte=='>'||tempByte=='<'){
+    }else if(tempByte=='$'||tempByte=='B'||tempByte=='>'||tempByte=='<'){
       headString+= (char)tempByte;
       if(headString=="$B>"||headString=="$B<"){
         startData=1;
+        headString="";
       }
     }else{
       headString="";

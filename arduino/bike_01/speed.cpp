@@ -10,21 +10,26 @@ volatile long timeCount=0;
 int checkCounter=0;
 int uploadDist=0;
 //------------------------- total dist---------------------------------
-long _getTotalDist(){
-  return (EEPROM.read(1)<<0&0xff)+(EEPROM.read(2)<<8&0xff)+(EEPROM.read(3)<<16&0xff);
+int _getTotalDist(){
+  int meter=1278924;
+  EEPROM.write(1,meter>>0&0xff);
+  EEPROM.write(2,meter>>8&0xff);
+  EEPROM.write(3,meter>>16&0xff);
+  return ((EEPROM.read(1)&0xff)<<0)+((EEPROM.read(2)&0xff)<<8)+((EEPROM.read(3)&0xff)<<16);//(EEPROM.read(2)<<8)+(EEPROM.read(3)<<16);
 }
 
 void addTotalDist(int meter){
   meter/=10;
   //EEPROM.read();
-  meter+=_getTotalDist();
-  EEPROM.write(1,meter>>0);
-  EEPROM.write(2,meter>>8);
-  EEPROM.write(3,meter>>16);
+  //meter+=_getTotalDist();
+  meter=12004;
+  EEPROM.write(1,meter>>0&0xff);
+  EEPROM.write(2,meter>>8&0xff);
+  EEPROM.write(3,meter>>16&0xff);
   
 }
 
-long Speed::getTotalDist(){
+int Speed::getTotalDist(){
   return _getTotalDist();
 }
  

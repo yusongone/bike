@@ -15,7 +15,7 @@ public class Protocol{
     public Protocol(){
     }
 
-    private String headString;
+    private String headString="";
     private int dataLength=-1;
     private int startData=0;
     private int subIndex=0;
@@ -35,27 +35,40 @@ public class Protocol{
                 buf[subIndex++]=tempByte;
                 startData++;
             }else if(startData>2){
-                if(dataLength==-1){
-                    //if(checkSum()){
+                if(dataLength==0){
+                    buf[subIndex++]=tempByte;
+                    if(checkSum(buf)){
                         switchCMD(buf);
-                    //};
+                    };
                     startData=0;
                     subIndex=0;
                 }else{
                     buf[subIndex++]=tempByte;
                     dataLength--;
                 }
-            }
-            if(tempByte=='$'||tempByte=='B'||tempByte=='>'||tempByte=='<'){
+            }else if(tempByte=='$'||tempByte=='B'||tempByte=='>'||tempByte=='<'){
                 headString+= (char)tempByte;
                 if(headString.equals("$B>")||headString.equals("$B<")){
                     startData=1;
+                    headString="";
                 }
             }else{
                 headString="";
             }
         }
     }
+
+    private boolean checkSum(byte[] buf){
+        byte c=buf[0];//datalength;
+        for(int i=1;i<=subIndex-2;i++){
+            c=(byte)(c^(buf[i]&0xff));
+        };
+        if(c==buf[subIndex-1]){
+            return true;
+        }
+        return false;
+    }
+
     public void switchCMD(byte[] bytes){
          switch(bytes[1]&0xff){
              case GET_SPEED:
@@ -71,18 +84,18 @@ public class Protocol{
     }
 
     private void got_speed(byte[] bytes){
-        int d=(bytes[2]<<0&0xff)+(bytes[3]<<8);
+
+        int d=((bytes[2]&0xff)<<0)+((bytes[3]&0xff)<<8);
         onAction.speedChange((float)d/10);
     }
 
     private void got_trip_dist(byte[] bytes){
-        int d=(bytes[2]<<0&0xff)+(bytes[3]<<8);
+        int d=((bytes[2]&0xff)<<0)+((bytes[3]&0xff)<<8);
         onAction.tripDistChange(d);
     }
 
     private void got_total_dist(byte[] bytes){
-        int d=(bytes[2]<<0&0xff)+(bytes[3]<<8&0xff)+(bytes[4]<<16&0xff);
-
+        long d=((bytes[2]&0xff)<<0)+((bytes[3]&0xff)<<8)+((bytes[4]&0xff)<<16);
         onAction.totalDistChange(d);
     }
 
@@ -114,7 +127,7 @@ public class Protocol{
 
     public static class OnAction{
         protected void speedChange(float num){ }
-        protected void totalDistChange(int num){ }
+        protected void totalDistChange(long num){ }
         protected void tripDistChange(float num){ }
         protected void airChange(float num){ }
     }

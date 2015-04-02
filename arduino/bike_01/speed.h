@@ -13,7 +13,7 @@ class Speed{
     float getSpeed();
     void init();
     
-    long getTotalDist();
+    int getTotalDist();
    
     void writeOnceDist();
     int getTripDist();
