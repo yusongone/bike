@@ -23,14 +23,13 @@ int subIndex=0;
 int msgId;
 boolean Hard=true;
 uint8_t  buf[RECIVE_BUFFER_SIZE];
-SoftwareSerial softSerial =  SoftwareSerial(SOFTWARE_SERIAL_RX, SOFTWARE_SERIAL_TX);
+//SoftwareSerial softSerial =  SoftwareSerial(SOFTWARE_SERIAL_RX, SOFTWARE_SERIAL_TX);
 
 Speed mySpeed;
 
 void Protocol::init(){
   pinMode(13,OUTPUT);
   mySpeed.init();
-  softSerial.begin(SOFTWARE_SERIAL_RATE);
 }
 
 
@@ -45,7 +44,7 @@ byte getSum(byte b[]){
 
 void write_speed(){
   int tempValue=(mySpeed.getSpeed()*36);
-  tempValue=1350;
+  //tempValue=1350;
   byte buffer[8];
   buffer[0]=0x24;
   buffer[1]=0x42;
@@ -60,7 +59,7 @@ void write_speed(){
 
 void write_total_dist(){
   long tempValue=mySpeed.getTotalDist();
-  tempValue=127894;
+  //tempValue=127894;
   byte buffer[9];
   buffer[0]=0x24;
   buffer[1]=0x42;
@@ -76,7 +75,7 @@ void write_total_dist(){
 
 void write_trip_dist(){
   long tempValue=mySpeed.getTripDist();
-  tempValue=65534;
+  //tempValue=65534;
   byte buffer[8];
   buffer[0]=0x24;
   buffer[1]=0x42;
@@ -123,6 +122,7 @@ void Protocol::reciveCMD(){
   //int dl=Serial.available();
   while(Serial.available()>0){
     byte tempByte=Serial.read();
+    Serial.write(tempByte);
     if(startData==1){//get dataLength;
       dataLength=(int)tempByte;
       buf[subIndex++]=dataLength;
@@ -135,7 +135,7 @@ void Protocol::reciveCMD(){
         if(dataLength==0){
           buf[subIndex++]=tempByte;
           if(checkSum()){
-            switchCMD();
+            //switchCMD();
           };
           startData=0;
           subIndex=0;

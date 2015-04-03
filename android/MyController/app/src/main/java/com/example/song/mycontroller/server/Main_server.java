@@ -39,6 +39,7 @@ public class Main_server extends Service {
 
     private int cmdStatus;
     private MyDatabase.Point pointModel;
+    private Thread sendDataThread=null;
 
 
     @Override
@@ -78,6 +79,7 @@ public class Main_server extends Service {
             @Override
             protected void totalDistChange(long num) {
                 super.totalDistChange(num);
+
                 Log.e("*****","total dist change"+num);
             }
 
@@ -90,11 +92,16 @@ public class Main_server extends Service {
     }
 
     private void keepRequestBTData(){
-        new Thread(new Runnable() {
+        if(sendDataThread!=null&&sendDataThread.isAlive()){
+            Log.e("",sendDataThread.isAlive()+"");
+            return;
+        }
+         sendDataThread=new Thread(new Runnable() {
             @Override
             public void run() {
                 Log.e("Main_server","start request data from bt drive");
                 while (bluetoothStates==2){
+                    Log.e("a","sendCMD");
                     bt_connection.sendCMDToQueue(protocol.requestTripDist());
                     bt_connection.sendCMDToQueue(protocol.requestTotalDist());
                     bt_connection.sendCMDToQueue(protocol.requestSpeed());
@@ -105,7 +112,8 @@ public class Main_server extends Service {
                     }
                 }
             }
-        }).start();
+        });
+        sendDataThread.start();
     }
 
 

@@ -130,8 +130,10 @@ public class BT_connection extends BluetoothGattCallback{
                             Log.e("BT_connection","get a ble device, now you can send data to ble device");
                             scanLeDevice(false);
                             serialChara=gatt_chara;
+
                             serialGatt.setCharacteristicNotification(serialChara,true);//open characteristic
                             onAction.getSerialChara();
+                            Log.e("BT_connection","getSerialChara device");
                             break;
                         };
                     }
@@ -148,9 +150,8 @@ public class BT_connection extends BluetoothGattCallback{
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
                 super.onCharacteristicChanged(gatt, characteristic);
                 byte[] b=characteristic.getValue();
-                Log.e("BT_connect","yffou have a bt goods");
                 for(int i=0;i<b.length;i++){
-                        Log.e("get","---------------"+(b[i]&0xff));
+                 //       Log.e("get","---------------"+(b[i]&0xff));
                 }
                 onAction.haveGoods(b);
             }
@@ -158,24 +159,26 @@ public class BT_connection extends BluetoothGattCallback{
             @Override
             public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 super.onCharacteristicWrite(gatt, characteristic, status);
+                Log.e(">>>>>>","write complete"+status);
                 if(status==0){
-                    myQ.top(18);// sub queue when write success;
+                    myQ.sendSuccess();
                 }
                 writeQueue();
             }
         };
     }
     private void writeQueue(){
-       byte[] b=myQ.get(18);
-        Log.e("BT_connection","length"+myQ.size());
+       byte[] b=myQ.get(20);
+        Log.e("==============","ready write");
         if(myQ.size()>0&&serialChara!=null){
             serialChara.setValue(b);
             serialGatt.writeCharacteristic(serialChara);
+            Log.e("==============","write ok");
         }
     }
     public void sendCMDToQueue(byte[] b){
+
         myQ.addElement(b);
-        Log.e("BT_connection","----------length"+myQ.size());
         if(myQ.size()==b.length){
             writeQueue();
         }
@@ -194,21 +197,24 @@ public class BT_connection extends BluetoothGattCallback{
 
     private static class Q{
         private byte[] queue=new byte[0];
+        private int getLength=0;
 
         public void addElement(byte[] b){
             queue=mergeCMD(queue,b);
         }
 
         public byte[] get(int count){
-            if(count>queue.length){count=queue.length;};
+            if(count>queue.length){
+                count=queue.length;
+            };
+            getLength=count;
             byte[] temp=new byte[count];
             System.arraycopy(queue, 0, temp, 0, count);
             return temp;
         }
-        public void top(int count){
-            if(count>queue.length){count=queue.length;};
-            byte[] newQ=new byte[queue.length-count];
-            System.arraycopy(queue, count, newQ, 0, newQ.length);
+        public void sendSuccess(){
+            byte[] newQ=new byte[queue.length-getLength];
+            System.arraycopy(queue, getLength, newQ, 0, newQ.length);
             queue=newQ;
         }
         public int size(){

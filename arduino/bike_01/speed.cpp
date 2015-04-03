@@ -11,18 +11,13 @@ int checkCounter=0;
 int uploadDist=0;
 //------------------------- total dist---------------------------------
 int _getTotalDist(){
-  int meter=1278924;
-  EEPROM.write(1,meter>>0&0xff);
-  EEPROM.write(2,meter>>8&0xff);
-  EEPROM.write(3,meter>>16&0xff);
   return ((EEPROM.read(1)&0xff)<<0)+((EEPROM.read(2)&0xff)<<8)+((EEPROM.read(3)&0xff)<<16);//(EEPROM.read(2)<<8)+(EEPROM.read(3)<<16);
 }
 
 void addTotalDist(int meter){
   meter/=10;
   //EEPROM.read();
-  //meter+=_getTotalDist();
-  meter=12004;
+  meter+=_getTotalDist();
   EEPROM.write(1,meter>>0&0xff);
   EEPROM.write(2,meter>>8&0xff);
   EEPROM.write(3,meter>>16&0xff);
@@ -35,7 +30,7 @@ int Speed::getTotalDist(){
  
  //------------------------- trip dist---------------------------------
 int _getTripDist(){
-  return (EEPROM.read(4)<<0&0xff)+(EEPROM.read(5)<<8&0xff);
+  return ((EEPROM.read(4)&0xff)<<0)+((EEPROM.read(5)&0xff)<<8);
 };
 
 void addTripDist(int meter){
