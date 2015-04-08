@@ -1,17 +1,33 @@
 #include "speed.h"
 
-volatile boolean dir=false;
-volatile int signal;
+volatile boolean speedStatus=false;
+volatile boolean footStatus=false;
+volatile int wheelSignal;
+volatile int footSignal;
 volatile long oldTime;
+
+volatile long speedOldTime=millis();
+volatile long footOldTime=millis();
+
+
 volatile long now;
 volatile long TotalTimeInterval=100000000;
 volatile long timeCount=0;
 
-int checkCounter=0;
-int uploadDist=0;
+int wheelLapCounter=0;
+
+
+
+
+int speedSensorCheckCounter=0;// use to muli speed sensor;
+int tripDistCounter=0;
+#include "protocol.h"
+
+
+
 //------------------------- total dist---------------------------------
 int _getTotalDist(){
-  return ((EEPROM.read(1)&0xff)<<0)+((EEPROM.read(2)&0xff)<<8)+((EEPROM.read(3)&0xff)<<16);//(EEPROM.read(2)<<8)+(EEPROM.read(3)<<16);
+  return ((EEPROM.read(1)&0xff)<<0)+((EEPROM.read(2)&0xff)<<8)+((EEPROM.read(3)&0xff)<<16);
 }
 
 void addTotalDist(int meter){
@@ -24,7 +40,7 @@ void addTotalDist(int meter){
   
 }
 
-int Speed::getTotalDist(){
+int getTotalDist(){
   return _getTotalDist();
 }
  
@@ -41,19 +57,16 @@ void addTripDist(int meter){
   addTotalDist(100);
 };
 
-void Speed::resetTripDist(){
+void resetTripDist(){
   EEPROM.write(4,0);
   EEPROM.write(5,0);
 }
 
-int Speed::getTripDist(){
+int getTripDist(){
   return _getTripDist();
 }
 
-Speed::Speed(){
-}
-
-void Speed::init(){
+void initSpeedISR(){
   pinMode(SPEED_READ_PIN,INPUT);
   TCCR2A = 0x02;     // DISABLE PWM ON DIGITAL PINS 3 AND 11, AND GO INTO CTC MODE
   TCCR2B = 0x06;     // DON'T FORCE COMPARE, 256 PRESCALER 
@@ -63,7 +76,7 @@ void Speed::init(){
   sei();    
 };
 
-float Speed::getSpeed(){
+float getSpeed(){
   if(timeCount>MIN_TIME){
     timeCount=0;
     TotalTimeInterval=2000000000;
@@ -72,33 +85,63 @@ float Speed::getSpeed(){
   return (float)WHEEL_PERIMETER/(float)SPEED_POINT_COUNT/(float)(TotalTimeInterval); //   (m/s)
 }
 
-void onOneCheck(){
-  if(checkCounter==0){//one lap
-    checkCounter=SPEED_POINT_COUNT;
-    uploadDist+=WHEEL_PERIMETER;
-    if(uploadDist>1000*100){
-      addTripDist(100);//add
-      uploadDist-=1000*100;
-    }
-  }else{
-    checkCounter--;
+void computerDist(){
+  tripDistCounter+=WHEEL_PERIMETER;
+  if(tripDistCounter>1000*100){//100m
+    addTripDist(100);//add
+    tripDistCounter-=100000;// 100m
   }
 }
 
 
+void onSpeedAction(){// whell one lap action;
+   computerDist();
+   wheelLapCounter++;
+}
+
+//one time foot sensor action;
+void onFootAction(){
+  long now=millis();
+  (60*1000)/(now-footOldTime);// lap/min
+  footOldTime=now;
+  write_trip_dist();      
+  
+}
+
 ISR(TIMER2_COMPA_vect){
   cli();
     now=millis();
-    signal=analogRead(SPEED_READ_PIN);
-    if(signal>SPEED_ANALOGREAD_HIGH){
-        dir=true;
-    }else if(signal<SPEED_ANALOGREAD_LOW&&dir){
-        dir=false;
+    wheelSignal=analogRead(SPEED_READ_PIN);
+    if(wheelSignal>SPEED_ANALOGREAD_HIGH){
+        speedStatus=true;
+    }else if(wheelSignal<SPEED_ANALOGREAD_LOW&&speedStatus){
+        speedStatus=false;
         TotalTimeInterval=timeCount;
         timeCount=0;
-        onOneCheck();
-    };
+        
+      if(speedSensorCheckCounter==0){//one lap
+        speedSensorCheckCounter=SPEED_POINT_COUNT;
+        onSpeedAction();
+      }else{
+        speedSensorCheckCounter--;
+      }  
+  };
+    
+    footSignal=analogRead(SPEED_READ_PIN);
+    if(footSignal>SPEED_ANALOGREAD_HIGH){
+      footStatus=true;
+    }else if(footSignal<SPEED_ANALOGREAD_LOW&&footStatus){
+      footStatus=false;
+      onFootAction();
+      
+    }
+    
     timeCount+=now-oldTime;
     oldTime=now;
+    
   sei();
 }
+
+
+
+

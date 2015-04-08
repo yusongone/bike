@@ -10,6 +10,10 @@ import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Arrays;
 
 /**
@@ -49,6 +53,8 @@ public class MyDatabase extends SQLiteOpenHelper {
     }
 
     private void parsePoint(String[] f){
+        JSONObject jsonObject=new JSONObject();
+        JSONArray jsonArray=new JSONArray();
         String newStr="";
         for(int i=0;i<f.length;i++){
             newStr+=f[i]+",";

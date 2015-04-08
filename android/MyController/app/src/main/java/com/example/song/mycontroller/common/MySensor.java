@@ -30,7 +30,7 @@ public class MySensor{
             float[] g=gy_data.getData();
             finalAngle_ROLL=k_Pitch.getAngle(a[0],g[1],gy_data.getDt());
             finalAngle_Pitch=k_Roll.getAngle(a[1],g[0],gy_data.getDt());
-            osd.OnChange(-finalAngle_Pitch,finalAngle_ROLL);
+            //osd.OnChange(-finalAngle_Pitch,finalAngle_ROLL);
             gy_data.clear();
             acc_data.clear();
         }
@@ -56,6 +56,7 @@ public class MySensor{
                 float nowY=(float)Math.sqrt(x*x+z*z);
                 float nowX=(float)Math.sqrt(y*y+z*z);
                 acc_data.setData(-(float)((Math.atan(x/nowX)*57.2957786)),-(float)((Math.atan(y/nowY)*57.2957786)),0);
+                osd.OnChange(x,y,z);
                 callback();
             }
             @Override
@@ -103,6 +104,8 @@ public class MySensor{
 
     public static class OnDataChange{
         public void OnChange(float Pitch,float Roll){
+        }
+        public void OnChange(float x,float y,float z){
         }
     }
 

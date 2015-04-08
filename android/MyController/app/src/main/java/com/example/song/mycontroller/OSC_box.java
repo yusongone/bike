@@ -122,10 +122,11 @@ public class OSC_box extends Activity {
         ms=new MySensor(sm);
         ms.addListener(new MySensor.OnDataChange(){
             @Override
-            public void OnChange(float Pitch, float Roll) {
+            public void OnChange(float Pitch, float Roll,float z) {
                 super.OnChange(Pitch, Roll);
-                line.pushPoint((int)Pitch);
-                line2.pushPoint((int)Roll);
+                line.pushPoint((int)(Pitch*10));
+                line2.pushPoint((int)(Roll*10));
+                line3.pushPoint((int)(z*10));
                 osd.post(new Runnable() {
                     @Override
                     public void run() {

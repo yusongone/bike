@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.example.song.mycontroller.bluetooth.Protocol;
 
+import org.json.JSONObject;
+
 import java.text.DecimalFormat;
 
 /**
@@ -13,48 +15,12 @@ public class DataBuffer {
     private OnAction onAction;
     private Long addPointTimes=0l;
     private int _TIME_OUT=30; // second
-   /*
     private int BufferSize=60;
-    private String[] buffer=new String[BufferSize];
-    private int cursor=0;
-    private int stopCount=0;
-    private boolean ended=false;
-    public static int _STOP_COUNTER=4;// times
-
-    public int addPoint(float speed){
-        String a = new DecimalFormat("###,###,###.##").format(speed);
-        if(checkAddPointTimeOut()){
-            ended=true;
-            onAction.onBufferReady(buffer,cursor,ended);
-            return 0;
-        }
-        buffer[cursor]=a;
-        if(speed==0&&!ended){
-            cursor++;
-            stopCount++;
-            ended=false;
-        }else{
-            stopCount=0;
-        }
-
-        if(stopCount==_STOP_COUNTER||cursor==BufferSize){// bike stop ;
-            ended=(stopCount==_STOP_COUNTER);
-            onAction.onBufferReady(buffer,cursor-1,ended);
-            cursor=0;
-            stopCount=0;
-            return 0;
-        }
-        return 1;
-    };
-    // if add point time out (bluetooth disconnect) , need create new row in record table;
-    */
-   private int BufferSize=60;
     private boolean newRow=true;
     private float[] tempBuffer=new float[BufferSize];
     private int cursor=0;
     public int addPoint(float speed) {
         tempBuffer[cursor]=speed;
-        Log.e("speed",speed+"");
         cursor++;
         if(checkStop(tempBuffer)==2){//isStop    need New Row
             String[] str=toStringArray(tempBuffer,cursor-2);

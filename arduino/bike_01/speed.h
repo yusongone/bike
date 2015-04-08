@@ -7,21 +7,11 @@
 #include "config.h"
 #include "EEPROM.h"
 
-class Speed{
-  public :
-    Speed();
-    float getSpeed();
-    void init();
-    
-    int getTotalDist();
-   
-    void writeOnceDist();
-    int getTripDist();
-    void resetTripDist(); 
-   
-  private :
-    int c;
-};
-
+float getSpeed();
+int getTotalDist();
+int getTripDist();
+void initSpeedISR();
+void writeOnceDist();
+void resetTripDist(); 
 
 #endif

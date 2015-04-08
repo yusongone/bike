@@ -3,8 +3,6 @@
 
 #define bufferSize 10
 #define RECIVE_BUFFER_SIZE 64
-#define SET_RAW_RC 200
-#define TEST 99
 
 #define CLEAR_TRIP_DISTANCE 100
 #define SET_WHEEL_PERIMETER 101
@@ -25,12 +23,7 @@ boolean Hard=true;
 uint8_t  buf[RECIVE_BUFFER_SIZE];
 //SoftwareSerial softSerial =  SoftwareSerial(SOFTWARE_SERIAL_RX, SOFTWARE_SERIAL_TX);
 
-Speed mySpeed;
 
-void Protocol::init(){
-  pinMode(13,OUTPUT);
-  mySpeed.init();
-}
 
 
 byte getSum(byte b[]){
@@ -42,9 +35,7 @@ byte getSum(byte b[]){
   return temp;
 }
 
-void write_speed(){
-  int tempValue=(mySpeed.getSpeed()*36);
-  //tempValue=1350;
+void write_speed(int tempValue){
   byte buffer[8];
   buffer[0]=0x24;
   buffer[1]=0x42;
@@ -57,9 +48,7 @@ void write_speed(){
   Serial.write(buffer,8);
 }
 
-void write_total_dist(){
-  long tempValue=mySpeed.getTotalDist();
-  //tempValue=127894;
+void write_total_dist(long tempValue){
   byte buffer[9];
   buffer[0]=0x24;
   buffer[1]=0x42;
@@ -74,7 +63,7 @@ void write_total_dist(){
 }
 
 void write_trip_dist(){
-  long tempValue=mySpeed.getTripDist();
+  long tempValue=getTripDist();
   //tempValue=65534;
   byte buffer[8];
   buffer[0]=0x24;
@@ -92,15 +81,13 @@ void write_trip_dist(){
 void switchCMD(){
    switch (msgId){
     case GET_SPEED:
-      write_speed();      
+      write_speed(4);      
     break;
     case GET_TOTAL_DISTANCE:
-      write_total_dist();      
+      write_total_dist(5);      
     break;
     case GET_TRIP_DISTANCE:
       write_trip_dist();      
-    break;
-    case TEST:
     break;
   }
 }
@@ -118,11 +105,11 @@ boolean checkSum(){
 
 
 
-void Protocol::reciveCMD(){
+void reciveCMD(){
   //int dl=Serial.available();
   while(Serial.available()>0){
     byte tempByte=Serial.read();
-    Serial.write(tempByte);
+    //Serial.write(tempByte);
     if(startData==1){//get dataLength;
       dataLength=(int)tempByte;
       buf[subIndex++]=dataLength;
@@ -135,7 +122,7 @@ void Protocol::reciveCMD(){
         if(dataLength==0){
           buf[subIndex++]=tempByte;
           if(checkSum()){
-            //switchCMD();
+            switchCMD();
           };
           startData=0;
           subIndex=0;
