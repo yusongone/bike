@@ -1,4 +1,6 @@
 #include "speed.h"
+#include "Adafruit_BMP085.h"
+#include "protocol.h"
 
 volatile boolean speedStatus=false;
 volatile boolean footStatus=false;
@@ -11,7 +13,6 @@ volatile long footOldTime=millis();
 
 
 volatile long now;
-volatile long TotalTimeInterval=100000000;
 volatile long timeCount=0;
 
 int wheelLapCounter=0;
@@ -21,9 +22,8 @@ int wheelLapCounter=0;
 
 int speedSensorCheckCounter=0;// use to muli speed sensor;
 int tripDistCounter=0;
-#include "protocol.h"
 
-
+Adafruit_BMP085 bmp;
 
 //------------------------- total dist---------------------------------
 int _getTotalDist(){
@@ -74,15 +74,17 @@ void initSpeedISR(){
   //OCR2A = 1249;      // SET THE TOP OF THE COUNT TO 124 FOR 500Hz SAMPLE RATE
   TIMSK2 = 0x02;     // ENABLE INTERRUPT ON MATCH BETWEEN TIMER2 AND OCR2A
   sei();    
+  initBMP085();
 };
+void initBMP085(){
+  if (!bmp.begin()) {
+    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+     while (1) {}
+  }
+}
 
 float getSpeed(){
-  if(timeCount>MIN_TIME){
-    timeCount=0;
-    TotalTimeInterval=2000000000;
-  }
-  //return signal;
-  return (float)WHEEL_PERIMETER/(float)SPEED_POINT_COUNT/(float)(TotalTimeInterval); //   (m/s)
+  return 0;
 }
 
 void computerDist(){
@@ -116,7 +118,6 @@ ISR(TIMER2_COMPA_vect){
         speedStatus=true;
     }else if(wheelSignal<SPEED_ANALOGREAD_LOW&&speedStatus){
         speedStatus=false;
-        TotalTimeInterval=timeCount;
         timeCount=0;
         
       if(speedSensorCheckCounter==0){//one lap
