@@ -38,7 +38,6 @@ public class Main_server extends Service {
     private Message msg;
 
     private int cmdStatus;
-    private MyDatabase.Point pointModel;
     private Thread sendDataThread=null;
 
 
@@ -47,7 +46,6 @@ public class Main_server extends Service {
         super.onCreate();
         bt_connection=new BT_connection((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE) ,this);
         protocol=new Protocol();
-        pointModel=new MyDatabase.Point();
         myDatabase=new MyDatabase(this,"df",null,1);
         SQLiteDatabase db=myDatabase.getWritableDatabase();
         myDatabase.startRecord(db);
@@ -63,9 +61,6 @@ public class Main_server extends Service {
             @Override
             protected void speedChange(float num) {
                 super.speedChange(num);
-                pointModel.set_speed(num);
-                myDatabase.addPoint(num);
-                speed=num;
                 onAction.speedChange(num);
                 Log.e("*****","speed change"+num);
             }
@@ -83,10 +78,28 @@ public class Main_server extends Service {
                 Log.e("*****","total dist change"+num);
             }
 
+
             @Override
-            protected void airChange(float num) {
-                super.airChange(num);
-                pointModel.set_air(num);
+            protected void dataChange(int speed, int pressure, int shake, int temp, int lap) {
+                super.dataChange(speed, pressure, shake, temp, lap);
+                MyDatabase.Point p=new MyDatabase.Point();
+                p.setSpeed(speed);
+                p.setPressure(pressure);
+                p.setShake(shake);
+                p.setTemp(temp);
+                p.setLap(lap);
+                myDatabase.addPoint(p);
+                onAction.speedChange((float)speed/10);
+                if(lap<Protocol.LAP&&speed>10){
+                    onAction.speedChange(0);
+                    MyDatabase.Point p0=new MyDatabase.Point();
+                    p0.setSpeed(0);
+                    p0.setPressure(0);
+                    p0.setShake(0);
+                    p0.setTemp(0);
+                    p0.setLap(0);
+                    myDatabase.addPoint(p0);
+                }
             }
         });
     }
@@ -101,10 +114,12 @@ public class Main_server extends Service {
             public void run() {
                 Log.e("Main_server","start request data from bt drive");
                 while (bluetoothStates==2){
+                    /*
                     Log.e("a","sendCMD");
                     bt_connection.sendCMDToQueue(protocol.requestTripDist());
                     bt_connection.sendCMDToQueue(protocol.requestTotalDist());
                     bt_connection.sendCMDToQueue(protocol.requestSpeed());
+                    */
                     try {
                         Thread.sleep(5*1000);
                     } catch (InterruptedException e) {
@@ -152,7 +167,7 @@ public class Main_server extends Service {
             @Override
             protected void getSerialChara() {
                 super.getSerialChara();
-                keepRequestBTData();
+                //keepRequestBTData();
             }
         });
     }

@@ -1,19 +1,5 @@
 #include "Protocol.h"
 
-
-#define bufferSize 10
-#define RECIVE_BUFFER_SIZE 64
-
-#define CLEAR_TRIP_DISTANCE 100
-#define SET_WHEEL_PERIMETER 101
-#define SET_MAGNET_COUNTER 102
-
-#define VERSION 200
-#define GET_SPEED 201
-#define GET_TRIP_DISTANCE 202
-#define GET_TOTAL_DISTANCE 203
-
-
 String headString="";
 int dataLength=-1;
 int startData=0;
@@ -34,8 +20,42 @@ byte getSum(byte b[]){
   }
   return temp;
 }
+void write_speed_pressure_shake(uint16_t speed,int32_t pressure,uint16_t shake,int16_t temperature,int lap){
+  byte buffer[16];
+  buffer[0]=0x24;
+  buffer[1]=0x42;
+  buffer[2]=0x3C;
+  buffer[3]=10;
+  buffer[4]=GET_SPEED_PRESSURE_SHAKE;
+  buffer[5]=speed>>0&0xff;
+  buffer[6]=speed>>8&0xff;
+  buffer[7]=pressure>>0&0xff;
+  buffer[8]=pressure>>8&0xff;
+  buffer[9]=pressure>>16&0xff;
+  buffer[10]=shake>>0&0xff;
+  buffer[11]=shake>>8&0xff;
+  buffer[12]=temperature>>0&0xff;
+  buffer[13]=temperature>>8&0xff;
+  buffer[14]=lap;
+  buffer[15]=getSum(buffer);
+  Serial.write(buffer,16);
+}
 
-void write_speed(int tempValue){
+void write_pressure(int32_t tempValue){
+  byte buffer[8];
+  buffer[0]=0x24;
+  buffer[1]=0x42;
+  buffer[2]=0x3C;
+  buffer[3]=0x03;
+  buffer[4]=GET_SPEED;
+  buffer[5]=tempValue>>0&0xff;
+  buffer[6]=tempValue>>8&0xff;
+  buffer[7]=tempValue>>16&0xff;
+  buffer[8]=getSum(buffer);
+  Serial.write(buffer,9);
+}
+
+void write_speed(uint16_t tempValue){
   byte buffer[8];
   buffer[0]=0x24;
   buffer[1]=0x42;

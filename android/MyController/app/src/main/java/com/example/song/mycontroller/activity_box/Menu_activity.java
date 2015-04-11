@@ -29,6 +29,7 @@ public class Menu_activity extends Activity {
         Button ibeacon=(Button)findViewById(R.id.ibeacon);
         Button login=(Button)findViewById(R.id.login);
         Button db=(Button)findViewById(R.id.DB);
+        myDatabase=new MyDatabase(this,"df",null,1);
 
         osc.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,12 +57,15 @@ public class Menu_activity extends Activity {
                 startActivity(intent);
             }
         });
-
-
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                login_server.request();
+                //login_server.request();
+                SQLiteDatabase db=myDatabase.getWritableDatabase();
+                myDatabase.startRecord(db);
+                String s=myDatabase.search();
+                Login l=new Login();
+                l.request(s);
             }
         });
         db.setOnClickListener(new View.OnClickListener() {

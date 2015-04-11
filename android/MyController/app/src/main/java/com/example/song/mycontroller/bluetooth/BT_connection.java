@@ -151,7 +151,7 @@ public class BT_connection extends BluetoothGattCallback{
                 super.onCharacteristicChanged(gatt, characteristic);
                 byte[] b=characteristic.getValue();
                 for(int i=0;i<b.length;i++){
-                 //       Log.e("get","---------------"+(b[i]&0xff));
+                        Log.e("get","---------------"+(b[i]&0xff));
                 }
                 onAction.haveGoods(b);
             }
@@ -159,7 +159,6 @@ public class BT_connection extends BluetoothGattCallback{
             @Override
             public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 super.onCharacteristicWrite(gatt, characteristic, status);
-                Log.e(">>>>>>","write complete"+status);
                 if(status==0){
                     myQ.sendSuccess();
                 }
@@ -169,11 +168,9 @@ public class BT_connection extends BluetoothGattCallback{
     }
     private void writeQueue(){
        byte[] b=myQ.get(20);
-        Log.e("==============","ready write");
         if(myQ.size()>0&&serialChara!=null){
             serialChara.setValue(b);
             serialGatt.writeCharacteristic(serialChara);
-            Log.e("==============","write ok");
         }
     }
     public void sendCMDToQueue(byte[] b){

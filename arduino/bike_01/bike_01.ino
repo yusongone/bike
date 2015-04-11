@@ -8,12 +8,13 @@
 
 //SoftwareSerial mySerial(11,10);
 void setup(){
+  pinMode(13,OUTPUT);
   Serial.begin(9600);
   initGy80();
   initSpeedISR();
+  initBMP085();
 }
 
 void loop(){
   reciveCMD();
-  delay(1000);
 }

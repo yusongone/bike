@@ -8,9 +8,11 @@ import com.example.song.mycontroller.bluetooth.MyBuf;
  * Created by song on 14/12/21.
  */
 public class Protocol{
+    public static int LAP=5;
     private final int GET_SPEED=201;
     private final int GET_TRIP_DIST=202;
     private final int GET_TOTAL_DIST=203;
+    private final int GET_SPEED_PRESSURE_SHAKE=205;
     private OnAction onAction;
     public Protocol(){
     }
@@ -80,6 +82,9 @@ public class Protocol{
              case GET_TRIP_DIST:
                  got_trip_dist(bytes);
                  break;
+             case GET_SPEED_PRESSURE_SHAKE:
+                 got_speed_pressure_shake(bytes);
+                 break;
          }
     }
 
@@ -87,6 +92,15 @@ public class Protocol{
 
         int d=((bytes[2]&0xff)<<0)+((bytes[3]&0xff)<<8);
         onAction.speedChange((float)d/10);
+    }
+
+    private void got_speed_pressure_shake(byte[] bytes){
+        int speed=((buf[2]&0xff)<<0|(buf[3]&0xff)<<8);
+        int pressure=((buf[4]&0xff)<<0|(buf[5]&0xff)<<8|(buf[6]&0xff)<<16);
+        int shake=((buf[7]&0xff)<<0|(buf[8]&0xff)<<8);
+        int temp=((buf[9]&0xff)<<0|(buf[10]&0xff)<<8);
+        int lap=((buf[11]&0xff)<<0);
+        onAction.dataChange(speed,pressure,shake,temp,lap);
     }
 
     private void got_trip_dist(byte[] bytes){
@@ -130,6 +144,7 @@ public class Protocol{
         protected void totalDistChange(long num){ }
         protected void tripDistChange(float num){ }
         protected void airChange(float num){ }
+        protected void dataChange(int speed,int pressure,int shake,int temp,int lap){ }
     }
 }
 

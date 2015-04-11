@@ -29,18 +29,23 @@ public class Login{
     public Login(){
 
     }
-    public void request(){
-        get=new get();
+    public void request(String s){
+        get=new get(s);
         get.start();
     }
 
     private class get extends Thread{
+        private String s;
+        public get(String s){
+            this.s=s;
+        }
         public void run(){
-            HttpPost hp=new HttpPost("http://www.makejs.com/login");
-            //HttpPost hp=new HttpPost("http://192.168.100.156:3420/login");
+            //HttpPost hp=new HttpPost("http://www.makejs.com/login");
+            HttpPost hp=new HttpPost("http://192.168.1.106:3420/put");
             //HttpPost hp=new HttpPost("http://192.168.100.132:4400/login");
             HttpClient httpClient=new DefaultHttpClient();
             LinkedList p=new LinkedList();
+            p.add(new BasicNameValuePair("text",s));
             p.add(new BasicNameValuePair("id","song"));
             p.add(new BasicNameValuePair("pass","song"));
             try {

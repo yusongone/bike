@@ -6,16 +6,27 @@ volatile boolean speedStatus=false;
 volatile boolean footStatus=false;
 volatile int wheelSignal;
 volatile int footSignal;
-volatile long oldTime;
 
-volatile long speedOldTime=millis();
-volatile long footOldTime=millis();
+volatile long speedOldTime=0;
+volatile long speedNowTime=0;
+volatile long footOldTime=0;
 
 
-volatile long now;
-volatile long timeCount=0;
+volatile long speedFreeTime=0;
+volatile long footFreeTime=0;
+volatile long nowISRTime=0;
+volatile long oldISRTime=0;
+
+
+uint16_t shakeOffset=0;
 
 int wheelLapCounter=0;
+uint16_t speedCache[10]={0};
+uint32_t pressureCache[10]={0};
+uint16_t shakeCache[10]={0};
+float tempCache[10]={0};
+
+bool stoped=false;
 
 
 
@@ -66,7 +77,13 @@ int getTripDist(){
   return _getTripDist();
 }
 
+void initBMP085(){
+  if (!bmp.begin()) {
+  }
+}
+
 void initSpeedISR(){
+  shakeOffset=getShake();
   pinMode(SPEED_READ_PIN,INPUT);
   TCCR2A = 0x02;     // DISABLE PWM ON DIGITAL PINS 3 AND 11, AND GO INTO CTC MODE
   TCCR2B = 0x06;     // DON'T FORCE COMPARE, 256 PRESCALER 
@@ -74,14 +91,7 @@ void initSpeedISR(){
   //OCR2A = 1249;      // SET THE TOP OF THE COUNT TO 124 FOR 500Hz SAMPLE RATE
   TIMSK2 = 0x02;     // ENABLE INTERRUPT ON MATCH BETWEEN TIMER2 AND OCR2A
   sei();    
-  initBMP085();
 };
-void initBMP085(){
-  if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-     while (1) {}
-  }
-}
 
 float getSpeed(){
   return 0;
@@ -96,52 +106,150 @@ void computerDist(){
 }
 
 
-void onSpeedAction(){// whell one lap action;
-   computerDist();
-   wheelLapCounter++;
+
+int status=HIGH;
+
+uint32_t computePressure(){
+    uint32_t sumPressure=0; 
+    for(int i=0;i<wheelLapCounter;i++){
+      sumPressure+=pressureCache[i]; 
+    }
+    if(wheelLapCounter==0){
+      return bmp.readPressure();
+    }
+    return sumPressure/wheelLapCounter;
 }
+
+int computeTemp(){
+    float sumTemp=0; 
+    for(int i=0;i<wheelLapCounter;i++){
+      sumTemp+=tempCache[i]; 
+    }
+    if(wheelLapCounter==0){
+      return bmp.readTemperature();
+    }
+    return (int)(sumTemp*10)/wheelLapCounter;
+}
+
+uint16_t computeAvgSpeed(){
+    uint16_t sumSpeed=0; 
+    for(int i=0;i<wheelLapCounter;i++){
+      sumSpeed+=speedCache[i]; 
+    }
+    if(wheelLapCounter==0){
+      return 0;
+    }
+    return sumSpeed/wheelLapCounter;
+}
+
+uint16_t computeShake(){
+    uint16_t sumShake=0; 
+    for(int i=0;i<wheelLapCounter;i++){
+      sumShake+=shakeCache[i]; 
+    }
+    if(wheelLapCounter==0){
+      return 0;
+    }
+    return abs((long)(sumShake/wheelLapCounter)-shakeOffset);
+}
+
+uint16_t getShake(){
+  int XYZ[3]={0};
+  getADXData(XYZ);
+  int x=abs(XYZ[0]);
+  int y=abs(XYZ[1]);
+  int z=abs(XYZ[2]);
+  return x+y+z;
+}
+
+
+void saveData(){
+    uint16_t shake=computeShake();
+    int temp=computeTemp();
+    uint32_t pressure=computePressure();
+    uint16_t speed=computeAvgSpeed();
+    write_speed_pressure_shake(speed,pressure,shake,temp,wheelLapCounter);
+}
+
+void onSpeedAction(){// whell one lap action;
+  computerDist();
+  speedNowTime=nowISRTime;
+  long subTime=speedNowTime-speedOldTime;
+  uint32_t speed;
+  if(stoped){
+    speed=0;
+    saveData();
+    wheelLapCounter=0;
+  }else{
+      speedCache[wheelLapCounter]=((long)WHEEL_PERIMETER*36)/subTime; // 10*m/s
+      pressureCache[wheelLapCounter]=bmp.readPressure();
+      tempCache[wheelLapCounter]=bmp.readTemperature();
+      shakeCache[wheelLapCounter]=getShake();
+      wheelLapCounter++;
+  }
+  if(wheelLapCounter==5){
+    status=!status;
+    saveData();
+    digitalWrite(13,status);
+    wheelLapCounter=0;
+  }
+  speedOldTime=speedNowTime;
+}
+
+
+void get(){
+  //Serial.println((long)(bmp.readPressure()/100));
+  //write_speed_pressure_shake(100,1002,0,321);
+}
+
 
 //one time foot sensor action;
 void onFootAction(){
-  long now=millis();
-  (60*1000)/(now-footOldTime);// lap/min
-  footOldTime=now;
-  write_trip_dist();      
-  
 }
-
 ISR(TIMER2_COMPA_vect){
   cli();
-    now=millis();
+    nowISRTime=millis();
+    speedFreeTime+=(nowISRTime-oldISRTime);
+    digitalWrite(13,HIGH);
+    footFreeTime+=(nowISRTime-oldISRTime);
+
     wheelSignal=analogRead(SPEED_READ_PIN);
     if(wheelSignal>SPEED_ANALOGREAD_HIGH){
         speedStatus=true;
     }else if(wheelSignal<SPEED_ANALOGREAD_LOW&&speedStatus){
         speedStatus=false;
-        timeCount=0;
-        
-      if(speedSensorCheckCounter==0){//one lap
-        speedSensorCheckCounter=SPEED_POINT_COUNT;
-        onSpeedAction();
-      }else{
-        speedSensorCheckCounter--;
-      }  
-  };
-    
-    footSignal=analogRead(SPEED_READ_PIN);
-    if(footSignal>SPEED_ANALOGREAD_HIGH){
+        speedFreeTime = 0;
+        if(speedSensorCheckCounter==0){//one lap
+            speedSensorCheckCounter=SPEED_POINT_COUNT;
+            stoped=false;
+            sei();
+            onSpeedAction();
+        }else{
+          speedSensorCheckCounter--;
+        }
+   };
+    footSignal=analogRead(FOOT_READ_PIN);
+    if(footSignal>FOOT_ANALOGREAD_HIGH){
       footStatus=true;
-    }else if(footSignal<SPEED_ANALOGREAD_LOW&&footStatus){
+    }else if(footSignal<FOOT_ANALOGREAD_LOW&&footStatus){
       footStatus=false;
       onFootAction();
-      
     }
-    
-    timeCount+=now-oldTime;
-    oldTime=now;
-    
+
+    if(!stoped&&speedFreeTime>5000){
+        stoped=true;
+        speedFreeTime=0;
+        sei();
+        onSpeedAction();
+        cli();
+    }
+    if(footFreeTime>3000){
+        onFootAction();
+    }
+    oldISRTime=nowISRTime;
   sei();
 }
+
 
 
 
