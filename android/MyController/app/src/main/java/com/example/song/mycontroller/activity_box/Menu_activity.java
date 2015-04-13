@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -65,7 +66,9 @@ public class Menu_activity extends Activity {
                 myDatabase.startRecord(db);
                 String s=myDatabase.search();
                 Login l=new Login();
+                Log.e("ff","request s");
                 l.request(s);
+
             }
         });
         db.setOnClickListener(new View.OnClickListener() {

@@ -34,7 +34,7 @@ public class Dashboard extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bt);
+        setContentView(R.layout.activity_dashboard);
         blueStatus=(TextView)findViewById(R.id.blueProgress);
         speedText=(TextView)findViewById(R.id.speedText);
         Intent intent = new Intent(Dashboard.this,Main_server.class);

@@ -42,6 +42,7 @@ public class Login{
         public void run(){
             //HttpPost hp=new HttpPost("http://www.makejs.com/login");
             HttpPost hp=new HttpPost("http://192.168.1.106:3420/put");
+//            HttpPost hp=new HttpPost("http://192.168.43.183:3420/put");
             //HttpPost hp=new HttpPost("http://192.168.100.132:4400/login");
             HttpClient httpClient=new DefaultHttpClient();
             LinkedList p=new LinkedList();

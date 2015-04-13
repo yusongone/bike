@@ -100,6 +100,7 @@ public class MyDatabase extends SQLiteOpenHelper {
             String sql="select * from record ORDER BY recordId";
             Cursor cursor=db.rawQuery(sql, null);
             Point p=new Point();
+            Log.e("count",""+cursor.getCount());
             String s="";
             while (cursor.moveToNext()){
                 int speed= cursor.getInt(1);
@@ -108,6 +109,7 @@ public class MyDatabase extends SQLiteOpenHelper {
                 int temp = cursor.getInt(4);
                 int lap = cursor.getInt(5);
                 String time=cursor.getString(6);
+
                 p.setSpeed(speed);
                 p.setPressure(pressure);
                 p.setShake(shake);
