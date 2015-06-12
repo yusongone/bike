@@ -1,0 +1,17 @@
+{
+  "db":{
+    "ip":"127.0.0.1",
+    "dbname":"transdb",
+    "user":"song",
+    "pass":"zhw"
+  }
+  ,"session_conf":{
+    "dbname":"sessionDB",
+    "path":"127.0.0.1",
+    "port":"27017",
+    "user":"song",
+    "pass":"zhw",
+    "collection":"session"
+  }
+}
+

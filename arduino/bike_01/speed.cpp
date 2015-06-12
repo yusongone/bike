@@ -82,16 +82,6 @@ void initBMP085(){
   }
 }
 
-void initSpeedISR(){
-  shakeOffset=getShake();
-  pinMode(SPEED_READ_PIN,INPUT);
-  TCCR2A = 0x02;     // DISABLE PWM ON DIGITAL PINS 3 AND 11, AND GO INTO CTC MODE
-  TCCR2B = 0x06;     // DON'T FORCE COMPARE, 256 PRESCALER 
-  OCR2A = 0X7C;      // SET THE TOP OF THE COUNT TO 124 FOR 500Hz SAMPLE RATE --2HZ
-  //OCR2A = 1249;      // SET THE TOP OF THE COUNT TO 124 FOR 500Hz SAMPLE RATE
-  TIMSK2 = 0x02;     // ENABLE INTERRUPT ON MATCH BETWEEN TIMER2 AND OCR2A
-  sei();    
-};
 
 float getSpeed(){
   return 0;
@@ -185,6 +175,7 @@ void onSpeedAction(){// whell one lap action;
       pressureCache[wheelLapCounter]=bmp.readPressure();
       tempCache[wheelLapCounter]=bmp.readTemperature();
       shakeCache[wheelLapCounter]=getShake();
+      shakeOffset=getShake();
       wheelLapCounter++;
   }
   if(wheelLapCounter==5){
@@ -206,11 +197,25 @@ void get(){
 //one time foot sensor action;
 void onFootAction(){
 }
-ISR(TIMER2_COMPA_vect){
+
+void initSpeedISR(){
+  pinMode(SPEED_READ_PIN,INPUT);
   cli();
+  TCCR2A = 0x02;     // DISABLE PWM ON DIGITAL PINS 3 AND 11, AND GO INTO CTC MODE
+  //OCR2A = 0X7C;      // SET THE TOP OF THE COUNT TO 124 FOR 500Hz SAMPLE RATE --2HZ
+  OCR2A = 11596;      // SET THE TOP OF THE COUNT TO 124 FOR 500Hz SAMPLE RATE --2HZ
+  //OCR2A = 1249;      // SET THE TOP OF THE COUNT TO 124 FOR 500Hz SAMPLE RATE
+  TIMSK2 = 0x02;     // ENABLE INTERRUPT ON MATCH BETWEEN TIMER2 AND OCR2A
+  sei();    
+};
+
+ISR(TIMER2_COMPA_vect){
+    wheelSignal=analogRead(SPEED_READ_PIN);
+  return;
+  cli();
+    digitalWrite(13,HIGH);
     nowISRTime=millis();
     speedFreeTime+=(nowISRTime-oldISRTime);
-    digitalWrite(13,HIGH);
     footFreeTime+=(nowISRTime-oldISRTime);
 
     wheelSignal=analogRead(SPEED_READ_PIN);

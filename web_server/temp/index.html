@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="./jquery.js"></script>
+    <script src="./f.json"></script>
+    <script src="./b.js"></script>
+    <style rel="stylesheet">
+      .box{
+        position:absolute;
+        top:0;
+        left:0;
+      }
+      .page{
+        width:50000px;
+        float:left;
+        position:relative;
+      }
+      .itemc,.item,.itemb{
+        width: 5px;
+        float: left;
+        background: #ddd;
+        border-top:1px solid red;
+      }
+      .a{
+        border-bottom:2px solid red;
+        background:black;
+      }
+      .itemb{
+        background:blue;
+      }
+      .itemc{
+        background:yellow;
+      }
+      .time{
+        width:200px;
+        height:30px;
+        position:fixed;
+        top:0;
+        left:0;
+        border:1px solid red;
+      }
+    </style>
+  </head>
+  <body onload="init()">
+    <div class="page" id="page"></div>
+    <div class="time" id="time"></div>
+  </body>
+</html>

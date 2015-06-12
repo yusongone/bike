@@ -1,6 +1,7 @@
 #include "sensor.h"
 #include "Wire.h"
 
+
 #define BMPaddress 0x77  // I2C BMP085_ADDRESS address of BMP085  
 #define HMCaddress 0x1E//HMC5883L cichang
 #define L3Gaddress 0xD2>>1//L3G4200D tuoluoyi
